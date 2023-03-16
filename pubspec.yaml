@@ -1,0 +1,31 @@
+name: videosdk_hls_flutter_example
+description: A new Flutter project.
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=2.19.3 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  videosdk:
+    path: ../../zn_flutter_sdk
+  http: ^0.13.5
+  flutter_dotenv: ^5.0.2
+  flutter_svg: ^2.0.2
+  touch_ripple_effect: ^2.2.3
+  video_player: ^2.6.0
+  chewie: ^1.4.0
+  lecle_yoyo_player: ^0.0.5+2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - .env
