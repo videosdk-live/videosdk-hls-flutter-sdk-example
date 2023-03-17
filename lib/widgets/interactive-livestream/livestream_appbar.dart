@@ -23,15 +23,26 @@ class LivestreamAppBar extends StatefulWidget {
 }
 
 class LivestreamAppBarState extends State<LivestreamAppBar> {
+  int participants = 1;
+
   @override
   void initState() {
     super.initState();
+    participants = widget.meeting.participants.length + 1;
+    registerMeetingEventListener(widget.meeting);
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 6),
       child: Row(
         children: [
           IconButton(
@@ -50,8 +61,39 @@ class LivestreamAppBarState extends State<LivestreamAppBar> {
               widget.hlsState == "HLS_STOPPING" ||
               widget.hlsState == "HLS_STARTED")
             const HorizontalSpacer(),
+          if (widget.hlsState == "HLS_STARTED")
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: const Color.fromRGBO(0, 0, 0, 0.3),
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.remove_red_eye,
+                    size: 16,
+                  ),
+                  const HorizontalSpacer(6),
+                  Text(participants.toString()),
+                ],
+              ),
+            )
         ],
       ),
     );
+  }
+
+  void registerMeetingEventListener(Room meeting) {
+    meeting.on(Events.participantJoined, (participant) {
+      setState(() {
+        participants = meeting.participants.length + 1;
+      });
+    });
+    meeting.on(Events.participantLeft, (participant) {
+      setState(() {
+        participants = meeting.participants.length + 1;
+      });
+    });
   }
 }

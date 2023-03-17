@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:touch_ripple_effect/touch_ripple_effect.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
+import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'chat_widget.dart';
 
 // ChatScreen
 class ChatView extends StatefulWidget {
   final Room meeting;
   final bool showClose;
+  final Orientation orientation;
+  final Function onClose;
   const ChatView({
     Key? key,
     required this.meeting,
+    required this.orientation,
+    required this.onClose,
     required this.showClose,
   }) : super(key: key);
 
@@ -45,6 +52,7 @@ class _ChatViewState extends State<ChatView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: secondaryColor,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         flexibleSpace: Align(
           alignment: Alignment.centerLeft,
@@ -62,7 +70,7 @@ class _ChatViewState extends State<ChatView> {
               if (widget.showClose)
                 IconButton(
                   icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => widget.onClose(),
                 ),
             ],
           ),
@@ -85,6 +93,7 @@ class _ChatViewState extends State<ChatView> {
                           children: messages!.messages
                               .map(
                                 (e) => ChatWidget(
+                                  orientation: widget.orientation,
                                   message: e,
                                   isLocalParticipant: e.senderId ==
                                       widget.meeting.localParticipant.id,
@@ -94,55 +103,90 @@ class _ChatViewState extends State<ChatView> {
                         ),
                       ),
               ),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10), color: black600),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        controller: msgTextController,
-                        onChanged: (value) => setState(() {
-                          msgTextController.text;
-                        }),
-                        decoration: const InputDecoration(
-                            hintText: "Write your message",
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(
-                              color: black400,
-                            )),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      padding: EdgeInsets.fromLTRB(
+                          widget.orientation == Orientation.portrait ? 16 : 10,
+                          0,
+                          0,
+                          0),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: black600),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              style: TextStyle(
+                                fontSize:
+                                    widget.orientation == Orientation.portrait
+                                        ? 16
+                                        : 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              controller: msgTextController,
+                              onChanged: (value) => setState(() {
+                                msgTextController.text;
+                              }),
+                              decoration: const InputDecoration(
+                                  hintText: "Write your message",
+                                  border: InputBorder.none,
+                                  hintStyle: TextStyle(
+                                    color: black400,
+                                  )),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: msgTextController.text.trim().isEmpty
+                                ? null
+                                : () => widget.meeting.pubSub
+                                    .publish(
+                                      "CHAT",
+                                      msgTextController.text,
+                                      const PubSubPublishOptions(persist: true),
+                                    )
+                                    .then((value) => msgTextController.clear()),
+                            child: Container(
+                                padding: const EdgeInsets.all(8),
+                                width: 45,
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 0),
+                                decoration: BoxDecoration(
+                                    color: msgTextController.text.trim().isEmpty
+                                        ? null
+                                        : purple,
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: const Icon(Icons.send)),
+                          ),
+                        ],
                       ),
                     ),
-                    GestureDetector(
-                      onTap: msgTextController.text.trim().isEmpty
-                          ? null
-                          : () => widget.meeting.pubSub
-                              .publish(
-                                "CHAT",
-                                msgTextController.text,
-                                const PubSubPublishOptions(persist: true),
-                              )
-                              .then((value) => msgTextController.clear()),
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 8),
-                          width: 45,
-                          margin: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: msgTextController.text.trim().isEmpty
-                                  ? null
-                                  : purple,
-                              borderRadius: BorderRadius.circular(8)),
-                          child: const Icon(Icons.send)),
-                    )
-                  ],
-                ),
+                  ),
+                  const HorizontalSpacer(),
+                  TouchRippleEffect(
+                    borderRadius: BorderRadius.circular(12),
+                    rippleColor: primaryColor,
+                    onTap: () {
+                      widget.meeting.pubSub.publish("RAISE_HAND", "");
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Color.fromRGBO(0, 0, 0, 0.3),
+                      ),
+                      padding: const EdgeInsets.all(14),
+                      child: SvgPicture.asset(
+                        "assets/ic_hand.svg",
+                        color: Colors.white,
+                        height: 24,
+                        width: 24,
+                      ),
+                    ),
+                  ),
+                ],
               )
             ],
           ),

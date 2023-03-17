@@ -44,7 +44,7 @@ class _HLSIndicatorState extends State<HLSIndicator>
         // child: Lottie.asset('assets/recording_lottie.json', height: 35));
         child: Container(
             decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(4)), color: red),
+                borderRadius: BorderRadius.all(Radius.circular(6)), color: red),
             padding: const EdgeInsets.all(8),
             child: const Text("Live")));
   }

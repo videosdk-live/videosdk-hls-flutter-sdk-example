@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -90,4 +91,10 @@ Future<dynamic> fetchActiveHls(String token, String meetingId) async {
   });
   Map<dynamic, dynamic> activeHls = jsonDecode(response.body)['data'];
   return activeHls;
+}
+
+Future<dynamic> fetchHls(String url) async {
+  final http.Response response = await http.get(Uri.parse(url));
+  log(response.body);
+  return response.statusCode;
 }

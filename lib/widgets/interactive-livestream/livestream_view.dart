@@ -1,12 +1,14 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:videosdk/videosdk.dart';
+import 'package:videosdk_hls_flutter_example/utils/api.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/chat/chat_view.dart';
 import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_appbar.dart';
 import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_player.dart';
-import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_player_simple.dart';
 import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/waiting_for_hls.dart';
 
 class LivestreamView extends StatefulWidget {
@@ -25,13 +27,16 @@ class _LivestreamViewState extends State<LivestreamView> {
 
   late String hlsState;
   String? downstreamUrl;
+  bool showChat = true;
 
   @override
   void initState() {
     super.initState();
     // Register meeting events
     hlsState = widget.meeting.hlsState;
-    downstreamUrl = widget.meeting.hlsDownstreamUrl;
+    if (widget.meeting.hlsDownstreamUrl != null) {
+      updateDownstreamUrl(widget.meeting.hlsDownstreamUrl!);
+    }
 
     registerMeetingEvents(widget.meeting);
 
@@ -40,46 +45,57 @@ class _LivestreamViewState extends State<LivestreamView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
+    return Stack(
+      // mainAxisSize: MainAxisSize.max,
       children: [
-        LivestreamAppBar(meeting: widget.meeting, hlsState: hlsState),
         if (downstreamUrl == null ||
             hlsState == "HLS_STARTING" ||
             hlsState == "HLS_STOPPED")
-          Expanded(child: WaitingForHLS(isStopped: downstreamUrl != null)),
-        Expanded(
-          child: OrientationBuilder(builder: (context, orientation) {
-            return Flex(
-              direction: orientation == Orientation.portrait
-                  ? Axis.vertical
-                  : Axis.horizontal,
-              children: [
-                if (downstreamUrl != null &&
-                    (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING"))
-                  // Expanded(
-                  //   flex: orientation == Orientation.landscape ? 2 : 1,
-                  //   child: LivestreamPlayerSimple(
-                  //     downstreamUrl: downstreamUrl!,
-                  //     orientation: orientation,
-                  //     meeting: widget.meeting,
-                  //   ),
-                  // ),
-                  Expanded(
-                    flex: orientation == Orientation.landscape ? 2 : 1,
-                    child: LivestreamPlayer(
-                      downstreamUrl: downstreamUrl!,
-                      orientation: orientation,
-                      // meeting: widget.meeting,
-                    ),
+          WaitingForHLS(isStopped: downstreamUrl != null),
+        OrientationBuilder(builder: (context, orientation) {
+          return Flex(
+            direction: orientation == Orientation.portrait
+                ? Axis.vertical
+                : Axis.horizontal,
+            children: [
+              if (downstreamUrl != null &&
+                  (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING"))
+                Expanded(
+                  flex: orientation == Orientation.landscape ? 2 : 1,
+                  child: LivestreamPlayer(
+                    downstreamUrl: downstreamUrl!,
+                    orientation: orientation,
+                    showChat: showChat,
+                    onChatButtonClicked: () {
+                      setState(() {
+                        showChat = !showChat;
+                      });
+                    },
+                    onRaiseHandButtonClicked: () {
+                      widget.meeting.pubSub.publish("RAISE_HAND", "message");
+                    },
+                    // meeting: widget.meeting,
                   ),
+                ),
+              if (downstreamUrl != null &&
+                  (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING") &&
+                  (showChat || orientation == Orientation.portrait))
                 Expanded(
                     flex: orientation == Orientation.landscape ? 1 : 2,
-                    child: ChatView(meeting: widget.meeting, showClose: false))
-              ],
-            );
-          }),
-        )
+                    child: ChatView(
+                      meeting: widget.meeting,
+                      showClose: orientation != Orientation.portrait,
+                      orientation: orientation,
+                      onClose: () {
+                        setState(() {
+                          showChat = !showChat;
+                        });
+                      },
+                    ))
+            ],
+          );
+        }),
+        LivestreamAppBar(meeting: widget.meeting, hlsState: hlsState),
       ],
     );
   }
@@ -88,20 +104,15 @@ class _LivestreamViewState extends State<LivestreamView> {
     // Called when hls is started
 
     _meeting.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
-      if (mounted) {
-        showSnackBarMessage(
-            message:
-                "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : data['status'] == "HLS_STARTED" ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
-            context: context);
-      }
       setState(() {
         hlsState = data['status'];
       });
       if (data['status'] == "HLS_STARTED") {
-        Timer(const Duration(seconds: 10), () {
-          setState(() {
-            downstreamUrl = data['downstreamUrl'];
-          });
+        Timer(const Duration(seconds: 10),
+            () => {updateDownstreamUrl(data['downstreamUrl'])});
+      } else if (data['status'] == "HLS_STOPPED") {
+        setState(() {
+          downstreamUrl = null;
         });
       }
     });
@@ -128,5 +139,35 @@ class _LivestreamViewState extends State<LivestreamView> {
         }
       }
     });
+  }
+
+  Future<bool> isHlsPlayable(String url) async {
+    int response = await fetchHls(url);
+    log("URL response ${response}");
+    if (response == 200) {
+      return true;
+    }
+    return false;
+  }
+
+  void updateDownstreamUrl(String url) {
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      bool isPlayable = await isHlsPlayable(url);
+      setState(() {
+        downstreamUrl = url;
+      });
+      timer.cancel();
+    });
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
   }
 }

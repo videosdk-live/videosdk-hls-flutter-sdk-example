@@ -7,8 +7,12 @@ import 'package:videosdk_hls_flutter_example/utils/toast.dart';
 class ChatWidget extends StatelessWidget {
   final bool isLocalParticipant;
   final PubSubMessage message;
+  final Orientation orientation;
   const ChatWidget(
-      {Key? key, required this.isLocalParticipant, required this.message})
+      {Key? key,
+      required this.isLocalParticipant,
+      required this.message,
+      required this.orientation})
       : super(key: key);
 
   @override
@@ -36,29 +40,32 @@ class ChatWidget extends StatelessWidget {
                 Text(
                   isLocalParticipant ? "You" : message.senderName,
                   textAlign: TextAlign.left,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: black400,
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
+                    fontSize: orientation == Orientation.portrait ? 12 : 10,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   message.message,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: orientation == Orientation.portrait ? 16 : 14,
+                    fontWeight: orientation == Orientation.portrait
+                        ? FontWeight.w500
+                        : FontWeight.w400,
+                  ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Container(
                   alignment: Alignment.centerRight,
                   child: Text(
                     "${message.timestamp.toLocal().hour}:${message.timestamp.toLocal().minute}",
                     textAlign: TextAlign.end,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: black400,
-                        fontSize: 10,
+                        fontSize: orientation == Orientation.portrait ? 10 : 9,
                         fontWeight: FontWeight.w500),
                   ),
                 ),

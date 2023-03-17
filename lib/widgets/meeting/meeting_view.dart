@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
@@ -193,6 +194,10 @@ class _MeetingViewState extends State<MeetingView> {
                     key: const Key("ChatScreen"),
                     meeting: widget.meeting,
                     showClose: true,
+                    orientation: Orientation.portrait,
+                    onClose: () {
+                      Navigator.pop(context);
+                    },
                   ),
                 ).whenComplete(() => {
                       setState(() {
@@ -340,6 +345,22 @@ class _MeetingViewState extends State<MeetingView> {
           if (showChatSnackbar) {
             showSnackBarMessage(
                 message: message.senderName + ": " + message.message,
+                context: context);
+          }
+        }
+      }
+    });
+
+    meeting.pubSub.subscribe("RAISE_HAND", (message) {
+      if (message.senderId != meeting.localParticipant.id) {
+        if (mounted) {
+          if (showChatSnackbar) {
+            showSnackBarMessage(
+                icon: SvgPicture.asset(
+                  "assets/ic_hand.svg",
+                  color: Colors.black,
+                ),
+                message: message.senderName + " raised hand ",
                 context: context);
           }
         }

@@ -140,7 +140,7 @@ class _MeetingScreenState extends State<MeetingScreen> {
     PubSubMessages messages = await _meeting.pubSub
         .subscribe("CHANGE_MODE_${_meeting.localParticipant.id}",
             (PubSubMessage pubSubMessage) {
-      Map<dynamic, dynamic> message = pubSubMessage.message;
+      Map<dynamic, dynamic> message = jsonDecode(pubSubMessage.message);
       if (mounted) {
         if (message['mode'] == Mode.CONFERENCE.name) {
           showDialog(
