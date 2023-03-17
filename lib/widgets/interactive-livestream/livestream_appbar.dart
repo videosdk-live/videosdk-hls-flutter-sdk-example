@@ -34,6 +34,14 @@ class LivestreamAppBarState extends State<LivestreamAppBar> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
       child: Row(
         children: [
+          IconButton(
+              onPressed: () {
+                widget.meeting.leave();
+              },
+              icon: const Icon(
+                Icons.close,
+                color: Colors.white,
+              )),
           if (widget.hlsState == "HLS_STARTING" ||
               widget.hlsState == "HLS_STOPPING" ||
               widget.hlsState == "HLS_STARTED")
@@ -42,34 +50,6 @@ class LivestreamAppBarState extends State<LivestreamAppBar> {
               widget.hlsState == "HLS_STOPPING" ||
               widget.hlsState == "HLS_STARTED")
             const HorizontalSpacer(),
-          Expanded(
-            child: Row(
-              children: [
-                Text(
-                  widget.meeting.id,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                GestureDetector(
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-                    child: Icon(
-                      Icons.copy,
-                      size: 16,
-                    ),
-                  ),
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: widget.meeting.id));
-                    showSnackBarMessage(
-                        message: "Meeting ID has been copied.",
-                        context: context);
-                  },
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

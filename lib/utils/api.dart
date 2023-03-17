@@ -79,3 +79,15 @@ Future<dynamic> fetchSession(String token, String meetingId) async {
   List<dynamic> sessions = jsonDecode(meetingIdResponse.body)['data'];
   return sessions.first;
 }
+
+Future<dynamic> fetchActiveHls(String token, String meetingId) async {
+  final String? _VIDEOSDK_API_ENDPOINT = dotenv.env['VIDEOSDK_API_ENDPOINT'];
+
+  final Uri getActiveHlsUrl =
+      Uri.parse('$_VIDEOSDK_API_ENDPOINT/hls/$meetingId/active');
+  final http.Response response = await http.get(getActiveHlsUrl, headers: {
+    "Authorization": token,
+  });
+  Map<dynamic, dynamic> activeHls = jsonDecode(response.body)['data'];
+  return activeHls;
+}

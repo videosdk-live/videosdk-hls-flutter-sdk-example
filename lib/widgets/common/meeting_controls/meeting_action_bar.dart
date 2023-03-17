@@ -21,28 +21,30 @@ class MeetingActionBar extends StatelessWidget {
   final void Function(String) onMoreOptionSelected;
 
   final void Function(TapDownDetails) onSwitchMicButtonPressed;
-  const MeetingActionBar({
-    Key? key,
-    required this.isMicEnabled,
-    required this.isCamEnabled,
-    required this.isScreenShareEnabled,
-    required this.recordingState,
-    required this.hlsState,
-    required this.onCallEndButtonPressed,
-    required this.onCallLeaveButtonPressed,
-    required this.onMicButtonPressed,
-    required this.onSwitchMicButtonPressed,
-    required this.onCameraButtonPressed,
-    required this.onMoreOptionSelected,
-    required this.onChatButtonPressed,
-  }) : super(key: key);
+  final void Function(TapDownDetails) onSwitchCameraButtonPressed;
+  const MeetingActionBar(
+      {Key? key,
+      required this.isMicEnabled,
+      required this.isCamEnabled,
+      required this.isScreenShareEnabled,
+      required this.recordingState,
+      required this.hlsState,
+      required this.onCallEndButtonPressed,
+      required this.onCallLeaveButtonPressed,
+      required this.onMicButtonPressed,
+      required this.onSwitchMicButtonPressed,
+      required this.onCameraButtonPressed,
+      required this.onMoreOptionSelected,
+      required this.onChatButtonPressed,
+      required this.onSwitchCameraButtonPressed})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           PopupMenuButton(
               position: PopupMenuPosition.under,
@@ -57,11 +59,10 @@ class MeetingActionBar extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 child: const Icon(
                   Icons.call_end,
-                  size: 30,
+                  size: 26,
                   color: Colors.white,
                 ),
               ),
-              offset: const Offset(0, -185),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -86,7 +87,7 @@ class MeetingActionBar extends StatelessWidget {
                       SvgPicture.asset("assets/ic_end.svg"),
                     ),
                   ]),
-
+          const HorizontalSpacer(8),
           // Mic Control
           TouchRippleEffect(
             borderRadius: BorderRadius.circular(12),
@@ -103,7 +104,7 @@ class MeetingActionBar extends StatelessWidget {
                 children: [
                   Icon(
                     isMicEnabled ? Icons.mic : Icons.mic_off,
-                    size: 30,
+                    size: 26,
                     color: isMicEnabled ? Colors.white : primaryColor,
                   ),
                   GestureDetector(
@@ -120,6 +121,7 @@ class MeetingActionBar extends StatelessWidget {
               ),
             ),
           ),
+          const HorizontalSpacer(8),
 
           // Camera Control
           TouchRippleEffect(
@@ -133,16 +135,29 @@ class MeetingActionBar extends StatelessWidget {
                 color: isCamEnabled ? primaryColor : Colors.white,
               ),
               padding: const EdgeInsets.all(10),
-              child: SvgPicture.asset(
-                isCamEnabled
-                    ? "assets/ic_video.svg"
-                    : "assets/ic_video_off.svg",
-                width: 26,
-                height: 26,
-                color: isCamEnabled ? Colors.white : primaryColor,
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    isCamEnabled
+                        ? "assets/ic_video.svg"
+                        : "assets/ic_video_off.svg",
+                    width: 24,
+                    height: 24,
+                    color: isCamEnabled ? Colors.white : primaryColor,
+                  ),
+                  const HorizontalSpacer(8),
+                  GestureDetector(
+                      onTapDown: (details) =>
+                          {onSwitchCameraButtonPressed(details)},
+                      child: Icon(
+                        Icons.arrow_drop_down,
+                        color: isCamEnabled ? Colors.white : primaryColor,
+                      )),
+                ],
               ),
             ),
           ),
+          const HorizontalSpacer(8),
 
           TouchRippleEffect(
             borderRadius: BorderRadius.circular(12),
@@ -154,15 +169,16 @@ class MeetingActionBar extends StatelessWidget {
                 border: Border.all(color: secondaryColor),
                 color: primaryColor,
               ),
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               child: SvgPicture.asset(
                 "assets/ic_chat.svg",
-                width: 26,
-                height: 26,
+                width: 22,
+                height: 22,
                 color: Colors.white,
               ),
             ),
           ),
+          const HorizontalSpacer(8),
 
           // More options
           PopupMenuButton(
@@ -175,14 +191,13 @@ class MeetingActionBar extends StatelessWidget {
                   border: Border.all(color: secondaryColor),
                   // color: red,
                 ),
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 child: const Icon(
                   Icons.more_vert,
-                  size: 30,
+                  size: 26,
                   color: Colors.white,
                 ),
               ),
-              offset: const Offset(0, -250),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -195,16 +210,6 @@ class MeetingActionBar extends StatelessWidget {
                           : recordingState == "RECORDING_STARTING"
                               ? "Recording is starting"
                               : "Start Recording",
-                      null,
-                      SvgPicture.asset("assets/ic_recording.svg"),
-                    ),
-                    _buildMeetingPoupItem(
-                      "hls",
-                      hlsState == "HLS_STARTED"
-                          ? "Stop HLS"
-                          : hlsState == "HLS_STARTING"
-                              ? "HLS is starting"
-                              : "Start HLS",
                       null,
                       SvgPicture.asset("assets/ic_recording.svg"),
                     ),

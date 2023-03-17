@@ -6,9 +6,11 @@ import 'chat_widget.dart';
 // ChatScreen
 class ChatView extends StatefulWidget {
   final Room meeting;
+  final bool showClose;
   const ChatView({
     Key? key,
     required this.meeting,
+    required this.showClose,
   }) : super(key: key);
 
   @override
@@ -57,10 +59,11 @@ class _ChatViewState extends State<ChatView> {
                   ),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
+              if (widget.showClose)
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
             ],
           ),
         ),

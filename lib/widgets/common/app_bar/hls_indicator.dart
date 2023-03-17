@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:videosdk_hls_flutter_example/constants/colors.dart';
 
 class HLSIndicator extends StatefulWidget {
   final String hlsState;
@@ -19,6 +20,8 @@ class _HLSIndicatorState extends State<HLSIndicator>
     if (widget.hlsState == "HLS_STARTING" ||
         widget.hlsState == "HLS_STOPPING") {
       _animationController.repeat(reverse: true);
+    } else {
+      _animationController.forward();
     }
     super.initState();
   }
@@ -39,7 +42,11 @@ class _HLSIndicatorState extends State<HLSIndicator>
     return FadeTransition(
         opacity: _animationController,
         // child: Lottie.asset('assets/recording_lottie.json', height: 35));
-        child: Text("HLS"));
+        child: Container(
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(4)), color: red),
+            padding: const EdgeInsets.all(8),
+            child: const Text("Live")));
   }
 
   @override

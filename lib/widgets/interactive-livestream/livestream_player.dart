@@ -1,47 +1,83 @@
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:lecle_yoyo_player/lecle_yoyo_player.dart';
-import 'package:video_player/video_player.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:yoyo_player/yoyo_player.dart';
+import 'package:videosdk_hls_flutter_example/constants/colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:touch_ripple_effect/touch_ripple_effect.dart';
+import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
+// import 'package:chewie/chewie.dart';
 
 class LivestreamPlayer extends StatefulWidget {
   final String downstreamUrl;
-  const LivestreamPlayer({super.key, required this.downstreamUrl});
+  final Orientation orientation;
+  const LivestreamPlayer(
+      {super.key, required this.downstreamUrl, required this.orientation});
 
   @override
   State<LivestreamPlayer> createState() => _LivestreamPlayerState();
 }
 
 class _LivestreamPlayerState extends State<LivestreamPlayer> {
-  late ChewieController _chewieController;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Initialize Chewie Controller
-    // _chewieController = ChewieController(
-    //     videoPlayerController: VideoPlayerController.network(
-    //       widget.downstreamUrl,
-    //     ),
-    //     autoPlay: true,
-    //     showControls: true,
-    //     aspectRatio: 16 / 9,
-    //     allowFullScreen: true,
-    //     allowMuting: true,
-    //     showOptions: true);
-  }
-
   @override
   Widget build(BuildContext context) {
-    // return Chewie(controller: _chewieController);
-    return YoYoPlayer(
-      aspectRatio: 16 / 9,
-      url: widget.downstreamUrl,
-      videoStyle:
-          VideoStyle(bottomBarPadding: EdgeInsets.only(left: 16, right: 100)),
-      videoLoadingStyle: VideoLoadingStyle(),
+    return Stack(
+      children: [
+        YoYoPlayer(
+          aspectRatio: 16 / 9,
+          url: widget.downstreamUrl,
+          videoStyle: VideoStyle(
+            // videoQualityBgColor: Color.fromRGBO(0, 0, 0, 0.3),
+            // qualityOptionsBgColor: Color.fromRGBO(0, 0, 0, 0.3),
+            fullscreen: Icon(widget.orientation == Orientation.portrait
+                ? Icons.fullscreen
+                : Icons.fullscreen_exit),
+            // bottomBarPadding: EdgeInsets.only(
+            //     left: 16,
+            //     right: widget.orientation == Orientation.portrait ? 16 : 100),
+          ),
+          videoLoadingStyle: VideoLoadingStyle(),
+        ),
+        if (widget.orientation == Orientation.landscape)
+          Positioned(
+              bottom: 10,
+              right: 0,
+              child: Row(
+                children: [
+                  TouchRippleEffect(
+                    borderRadius: BorderRadius.circular(12),
+                    rippleColor: primaryColor,
+                    onTap: () {},
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Color.fromRGBO(0, 0, 0, 0.3),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: SvgPicture.asset(
+                        "assets/ic_hand.svg",
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const HorizontalSpacer(8),
+                  TouchRippleEffect(
+                    borderRadius: BorderRadius.circular(12),
+                    rippleColor: primaryColor,
+                    onTap: () {},
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Color.fromRGBO(0, 0, 0, 0.3),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: SvgPicture.asset(
+                        "assets/ic_chat.svg",
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              )),
+      ],
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
@@ -5,7 +7,10 @@ import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_grid_ti
 
 class ParticipantGrid extends StatefulWidget {
   final Room meeting;
-  const ParticipantGrid({Key? key, required this.meeting}) : super(key: key);
+  final Orientation orientation;
+  const ParticipantGrid(
+      {Key? key, required this.meeting, required this.orientation})
+      : super(key: key);
 
   @override
   State<ParticipantGrid> createState() => _ParticipantGridState();
@@ -28,6 +33,7 @@ class _ParticipantGridState extends State<ParticipantGrid> {
     participants.putIfAbsent(localParticipant.id, () => localParticipant);
     participants.addAll(widget.meeting.participants);
     presenterId = widget.meeting.activePresenterId;
+    numberOfMaxOnScreenParticipants = presenterId != null ? 2 : 6;
     updateOnScreenParticipants();
     // Setting meeting event listeners
     setMeetingListeners(widget.meeting);
@@ -44,13 +50,21 @@ class _ParticipantGridState extends State<ParticipantGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Flex(
+      direction: widget.orientation == Orientation.portrait
+          ? Axis.vertical
+          : Axis.horizontal,
       children: [
         for (int i = 0;
             i < (onScreenParticipants.length / numberofColumns).ceil();
             i++)
           Flexible(
-              child: Row(
+              child: Flex(
+            direction: widget.orientation == Orientation.portrait
+                ? Axis.horizontal
+                : numberofColumns == 1
+                    ? Axis.horizontal
+                    : Axis.vertical,
             children: [
               for (int j = 0;
                   j <

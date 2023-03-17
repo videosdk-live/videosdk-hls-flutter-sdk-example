@@ -12,7 +12,8 @@ import 'package:videosdk_hls_flutter_example/widgets/common/chat/chat_view.dart'
 
 class MeetingView extends StatefulWidget {
   final Room meeting;
-  const MeetingView({super.key, required this.meeting});
+  final String token;
+  const MeetingView({super.key, required this.meeting, required this.token});
 
   @override
   State<MeetingView> createState() => _MeetingViewState();
@@ -29,10 +30,15 @@ class _MeetingViewState extends State<MeetingView> {
   Stream? audioStream;
   Stream? remoteParticipantShareStream;
 
+  bool fullScreen = false;
+
   @override
   void initState() {
     super.initState();
     // Register meeting events
+    recordingState = widget.meeting.recordingState;
+    hlsState = widget.meeting.hlsState;
+
     registerMeetingEvents(widget.meeting);
     subscribeToChatMessages(widget.meeting);
   }
@@ -48,71 +54,194 @@ class _MeetingViewState extends State<MeetingView> {
   Widget build(BuildContext context) {
     final statusbarHeight = MediaQuery.of(context).padding.top;
 
-    return DefaultTabController(
-      length: 3,
-      initialIndex: 1,
-      child: Scaffold(
-        backgroundColor: primaryColor,
-        bottomNavigationBar: const TabBar(
-          indicatorColor: primaryColor,
-          tabs: [
-            Tab(
-              child: Text(
-                "Chat",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "Stage",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "Participants",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            MeetingAppBar(
-              meeting: widget.meeting,
+    return Scaffold(
+      backgroundColor: primaryColor,
+      body: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          MeetingAppBar(
+            meeting: widget.meeting,
+            token: widget.token,
+            recordingState: recordingState,
+            hlsState: hlsState,
+            isFullScreen: fullScreen,
+          ),
+          Expanded(
+            child: GestureDetector(
+                onDoubleTap: () => {
+                      setState(() {
+                        fullScreen = !fullScreen;
+                      })
+                    },
+                child: OrientationBuilder(builder: (context, orientation) {
+                  return Flex(
+                    direction: orientation == Orientation.portrait
+                        ? Axis.vertical
+                        : Axis.horizontal,
+                    children: [
+                      ScreenShareView(meeting: widget.meeting),
+                      Flexible(
+                          child: ParticipantGrid(
+                              meeting: widget.meeting,
+                              orientation: orientation))
+                    ],
+                  );
+                })),
+          ),
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 300),
+            crossFadeState: !fullScreen
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            secondChild: const SizedBox.shrink(),
+            firstChild: MeetingActionBar(
+              isMicEnabled: audioStream != null,
+              isCamEnabled: videoStream != null,
+              isScreenShareEnabled: shareStream != null,
               recordingState: recordingState,
               hlsState: hlsState,
+              // Called when Call End button is pressed
+              onCallEndButtonPressed: () {
+                widget.meeting.end();
+              },
+
+              onCallLeaveButtonPressed: () {
+                widget.meeting.leave();
+              },
+              // Called when mic button is pressed
+              onMicButtonPressed: () {
+                if (audioStream != null) {
+                  widget.meeting.muteMic();
+                } else {
+                  widget.meeting.unmuteMic();
+                }
+              },
+              // Called when camera button is pressed
+              onCameraButtonPressed: () {
+                if (videoStream != null) {
+                  widget.meeting.disableCam();
+                } else {
+                  widget.meeting.enableCam();
+                }
+              },
+
+              onSwitchMicButtonPressed: (details) async {
+                List<MediaDeviceInfo> outptuDevice =
+                    widget.meeting.getAudioOutputDevices();
+                double bottomMargin = (70.0 * outptuDevice.length);
+                final screenSize = MediaQuery.of(context).size;
+                await showMenu(
+                  context: context,
+                  color: black700,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  position: RelativeRect.fromLTRB(
+                    screenSize.width - details.globalPosition.dx,
+                    details.globalPosition.dy - bottomMargin,
+                    details.globalPosition.dx,
+                    (bottomMargin),
+                  ),
+                  items: outptuDevice.map((e) {
+                    return PopupMenuItem(value: e, child: Text(e.label));
+                  }).toList(),
+                  elevation: 8.0,
+                ).then((value) {
+                  if (value != null) {
+                    widget.meeting.switchAudioDevice(value);
+                  }
+                });
+              },
+
+              onSwitchCameraButtonPressed: (details) async {
+                List<MediaDeviceInfo> outptuDevice =
+                    widget.meeting.getCameras();
+                double bottomMargin = (70.0 * outptuDevice.length);
+                final screenSize = MediaQuery.of(context).size;
+                await showMenu(
+                  context: context,
+                  color: black700,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  position: RelativeRect.fromLTRB(
+                    screenSize.width - details.globalPosition.dx,
+                    details.globalPosition.dy - bottomMargin,
+                    details.globalPosition.dx,
+                    (bottomMargin),
+                  ),
+                  items: outptuDevice.map((e) {
+                    return PopupMenuItem(value: e, child: Text(e.label));
+                  }).toList(),
+                  elevation: 8.0,
+                ).then((value) {
+                  if (value != null) {
+                    widget.meeting.changeCam(value.deviceId);
+                  }
+                });
+              },
+
+              onChatButtonPressed: () {
+                setState(() {
+                  showChatSnackbar = false;
+                });
+                showModalBottomSheet(
+                  context: context,
+                  constraints: BoxConstraints(
+                      maxHeight:
+                          MediaQuery.of(context).size.height - statusbarHeight),
+                  isScrollControlled: true,
+                  builder: (context) => ChatView(
+                    key: const Key("ChatScreen"),
+                    meeting: widget.meeting,
+                    showClose: true,
+                  ),
+                ).whenComplete(() => {
+                      setState(() {
+                        showChatSnackbar = true;
+                      })
+                    });
+              },
+
+              // Called when more options button is pressed
+              onMoreOptionSelected: (option) {
+                // Showing more options dialog box
+                if (option == "screenshare") {
+                  if (remoteParticipantShareStream == null) {
+                    if (shareStream == null) {
+                      widget.meeting.enableScreenShare();
+                    } else {
+                      widget.meeting.disableScreenShare();
+                    }
+                  } else {
+                    showSnackBarMessage(
+                        message: "Someone is already presenting",
+                        context: context);
+                  }
+                } else if (option == "recording") {
+                  if (recordingState == "RECORDING_STOPPING") {
+                    showSnackBarMessage(
+                        message: "Recording is in stopping state",
+                        context: context);
+                  } else if (recordingState == "RECORDING_STARTED") {
+                    widget.meeting.stopRecording();
+                  } else if (recordingState == "RECORDING_STARTING") {
+                    showSnackBarMessage(
+                        message: "Recording is in starting state",
+                        context: context);
+                  } else {
+                    widget.meeting.startRecording();
+                  }
+                } else if (option == "participants") {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: false,
+                    builder: (context) =>
+                        ParticipantList(meeting: widget.meeting),
+                  );
+                }
+              },
             ),
-            Expanded(
-              child: TabBarView(children: [
-                ChatView(meeting: widget.meeting),
-                Stack(
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              ScreenShareView(meeting: widget.meeting),
-                              Flexible(
-                                  child:
-                                      ParticipantGrid(meeting: widget.meeting))
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-                ParticipantList(
-                  meeting: widget.meeting,
-                  showTitle: false,
-                ),
-              ]),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

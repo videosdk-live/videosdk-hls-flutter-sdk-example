@@ -38,10 +38,10 @@ class _JoinScreenState extends State<JoinScreen> {
   void initState() {
     if (widget.mode == Mode.CONFERENCE) initCameraPreview();
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.portraitUp,
+    //   DeviceOrientation.portraitDown,
+    // ]);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final token = await fetchToken(context);
       setState(() {
@@ -304,12 +304,12 @@ class _JoinScreenState extends State<JoinScreen> {
 
   @override
   void dispose() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.portraitUp,
+    //   DeviceOrientation.portraitDown,
+    //   DeviceOrientation.landscapeLeft,
+    //   DeviceOrientation.landscapeRight,
+    // ]);
     cameraTrack?.dispose();
     super.dispose();
   }

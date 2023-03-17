@@ -1,27 +1,20 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/meeting_appbar.dart';
+import 'package:videosdk_hls_flutter_example/widgets/common/chat/chat_view.dart';
 import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_appbar.dart';
 import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_player.dart';
+import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_player_simple.dart';
 import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/waiting_for_hls.dart';
 
 class LivestreamView extends StatefulWidget {
   final Room meeting;
-  final String token;
-  final String hlsState;
-  final String? downstreamUrl;
-  const LivestreamView(
-      {super.key,
-      required this.meeting,
-      required this.token,
-      required this.hlsState,
-      required this.downstreamUrl});
+  const LivestreamView({
+    super.key,
+    required this.meeting,
+  });
 
   @override
   State<LivestreamView> createState() => _LivestreamViewState();
@@ -30,11 +23,18 @@ class LivestreamView extends StatefulWidget {
 class _LivestreamViewState extends State<LivestreamView> {
   bool showChatSnackbar = true;
 
+  late String hlsState;
+  String? downstreamUrl;
+
   @override
   void initState() {
     super.initState();
     // Register meeting events
+    hlsState = widget.meeting.hlsState;
+    downstreamUrl = widget.meeting.hlsDownstreamUrl;
+
     registerMeetingEvents(widget.meeting);
+
     subscribeToChatMessages(widget.meeting);
   }
 
@@ -42,61 +42,69 @@ class _LivestreamViewState extends State<LivestreamView> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        LivestreamAppBar(meeting: widget.meeting, hlsState: widget.hlsState),
-        if (widget.downstreamUrl == null ||
-            widget.hlsState == "HLS_STARTING" ||
-            widget.hlsState == "HLS_STOPPED")
-          Expanded(
-              child: WaitingForHLS(isStopped: widget.downstreamUrl != null)),
-        if (widget.downstreamUrl != null &&
-            (widget.hlsState == "HLS_STARTED" ||
-                widget.hlsState == "HLS_STOPPING"))
-          Expanded(
-              child: LivestreamPlayer(
-            downstreamUrl: widget.downstreamUrl!,
-          )),
+        LivestreamAppBar(meeting: widget.meeting, hlsState: hlsState),
+        if (downstreamUrl == null ||
+            hlsState == "HLS_STARTING" ||
+            hlsState == "HLS_STOPPED")
+          Expanded(child: WaitingForHLS(isStopped: downstreamUrl != null)),
+        Expanded(
+          child: OrientationBuilder(builder: (context, orientation) {
+            return Flex(
+              direction: orientation == Orientation.portrait
+                  ? Axis.vertical
+                  : Axis.horizontal,
+              children: [
+                if (downstreamUrl != null &&
+                    (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING"))
+                  // Expanded(
+                  //   flex: orientation == Orientation.landscape ? 2 : 1,
+                  //   child: LivestreamPlayerSimple(
+                  //     downstreamUrl: downstreamUrl!,
+                  //     orientation: orientation,
+                  //     meeting: widget.meeting,
+                  //   ),
+                  // ),
+                  Expanded(
+                    flex: orientation == Orientation.landscape ? 2 : 1,
+                    child: LivestreamPlayer(
+                      downstreamUrl: downstreamUrl!,
+                      orientation: orientation,
+                      // meeting: widget.meeting,
+                    ),
+                  ),
+                Expanded(
+                    flex: orientation == Orientation.landscape ? 1 : 2,
+                    child: ChatView(meeting: widget.meeting, showClose: false))
+              ],
+            );
+          }),
+        )
       ],
     );
   }
 
   void registerMeetingEvents(Room _meeting) {
     // Called when hls is started
-    // _meeting.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
-    //   log("HLS STATE CHANGED");
-    //   showSnackBarMessage(
-    //       message:
-    //           "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : data['status'] == "HLS_STARTED" ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
-    //       context: context);
 
-    //   setState(() {
-    //     hlsState = data['status'];
-    //   });
-    //   if (data['status'] == "HLS_STARTED")
-    //     Timer(Duration(seconds: 10), () {
-    //       setState(() {
-    //         hlsDownstreamUrl = data['downstreamUrl'];
-    //       });
-    //     });
-    // });
-
-    // _meeting.on(Events.hlsStarted, (String url) {
-    //   // showSnackBarMessage(
-    //   //     message:
-    //   //         "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : data['status'] == "HLS_STARTED" ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
-    //   //     context: context);
-
-    //   setState(() {
-    //     hlsState = "HLS_STARTED";
-    //   });
-    //   Timer(Duration(seconds: 5), () {
-    //     setState(() {
-    //       hlsDownstreamUrl = url;
-    //     });
-    //   });
-    // });
-
+    _meeting.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
+      if (mounted) {
+        showSnackBarMessage(
+            message:
+                "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : data['status'] == "HLS_STARTED" ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
+            context: context);
+      }
+      setState(() {
+        hlsState = data['status'];
+      });
+      if (data['status'] == "HLS_STARTED") {
+        Timer(const Duration(seconds: 10), () {
+          setState(() {
+            downstreamUrl = data['downstreamUrl'];
+          });
+        });
+      }
+    });
     _meeting.on(
         Events.error,
         (error) => {

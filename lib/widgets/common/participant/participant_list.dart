@@ -8,10 +8,7 @@ import 'package:videosdk_hls_flutter_example/widgets/common/participant/particip
 
 class ParticipantList extends StatefulWidget {
   final Room meeting;
-  final bool showTitle;
-  const ParticipantList(
-      {Key? key, required this.meeting, required this.showTitle})
-      : super(key: key);
+  const ParticipantList({Key? key, required this.meeting}) : super(key: key);
 
   @override
   State<ParticipantList> createState() => _ParticipantListState();
@@ -33,37 +30,34 @@ class _ParticipantListState extends State<ParticipantList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryColor,
-      appBar: widget.showTitle
-          ? AppBar(
-              backgroundColor: primaryColor,
-              flexibleSpace: Align(
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          "Participants (" +
-                              (widget.meeting.participants.length + 1)
-                                  .toString() +
-                              ")",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
+      appBar: AppBar(
+        backgroundColor: primaryColor,
+        flexibleSpace: Align(
+          alignment: Alignment.centerLeft,
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    "Participants (" +
+                        (widget.meeting.participants.length + 1).toString() +
+                        ")",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 18),
+                  ),
                 ),
               ),
-              automaticallyImplyLeading: false,
-              elevation: 0,
-            )
-          : null,
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+        automaticallyImplyLeading: false,
+        elevation: 0,
+      ),
       body: SafeArea(
         child: Column(
           children: [

@@ -37,9 +37,6 @@ class _MeetingScreenState extends State<MeetingScreen> {
   late Room meeting;
   bool _joined = false;
 
-  String hlsState = "HLS_STOPPED";
-  String? downstreamUrl;
-
   Mode? localParticipantMode;
 
   @override
@@ -52,10 +49,6 @@ class _MeetingScreenState extends State<MeetingScreen> {
   @override
   void initState() {
     super.initState();
-    // SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.portraitUp,
-    //   DeviceOrientation.portraitDown,
-    // ]);
     // Create instance of Room (Meeting)
     Room room = VideoSDK.createRoom(
       roomId: widget.meetingId,
@@ -92,14 +85,10 @@ class _MeetingScreenState extends State<MeetingScreen> {
               child: Scaffold(
                   backgroundColor: Theme.of(context).primaryColor,
                   body: localParticipantMode == Mode.CONFERENCE
-                      ? MeetingView(
-                          meeting: meeting,
-                        )
+                      ? MeetingView(meeting: meeting, token: widget.token)
                       : LivestreamView(
                           meeting: meeting,
-                          downstreamUrl: downstreamUrl,
-                          hlsState: hlsState,
-                          token: widget.token)))
+                        )))
           : const WaitingToJoin(),
     );
   }
@@ -119,7 +108,6 @@ class _MeetingScreenState extends State<MeetingScreen> {
     );
 
     _meeting.on(Events.participantModeChanged, (Map<String, dynamic> data) {
-      log("MODE CHANGE " + data.toString());
       if (data['participantId'] == _meeting.localParticipant.id) {
         setState(() {
           localParticipantMode = _meeting.localParticipant.mode;
@@ -146,24 +134,6 @@ class _MeetingScreenState extends State<MeetingScreen> {
                   message: "${error['name']} :: ${error['message']}",
                   context: context)
             });
-
-    _meeting.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
-      showSnackBarMessage(
-          message:
-              "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : data['status'] == "HLS_STARTED" ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
-          context: context);
-
-      setState(() {
-        hlsState = data['status'];
-      });
-      if (data['status'] == "HLS_STARTED") {
-        Timer(const Duration(seconds: 10), () {
-          setState(() {
-            downstreamUrl = data['downstreamUrl'];
-          });
-        });
-      }
-    });
   }
 
   void registerModeListener(Room _meeting) async {
@@ -222,12 +192,6 @@ class _MeetingScreenState extends State<MeetingScreen> {
 
   @override
   void dispose() {
-    // SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.portraitUp,
-    //   DeviceOrientation.portraitDown,
-    //   DeviceOrientation.landscapeLeft,
-    //   DeviceOrientation.landscapeRight,
-    // ]);
     super.dispose();
   }
 }

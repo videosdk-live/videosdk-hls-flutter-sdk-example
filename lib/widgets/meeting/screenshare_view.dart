@@ -22,6 +22,21 @@ class _ScreenShareViewState extends State<ScreenShareView> {
 
   @override
   void initState() {
+    _presenterParticipant = widget.meeting.activePresenterId != null
+        ? widget.meeting.participants.values.firstWhere(
+            (element) => element.id == widget.meeting.activePresenterId)
+        : null;
+
+    if (widget.meeting.activePresenterId ==
+        widget.meeting.localParticipant.id) {
+      _presenterParticipant = widget.meeting.localParticipant;
+      isLocalScreenShare = true;
+    }
+
+    presenterId = _presenterParticipant?.id;
+
+    shareStream = _presenterParticipant?.streams.values
+        .firstWhere((stream) => stream.kind == "share");
     setMeetingListeners(widget.meeting);
     super.initState();
   }
