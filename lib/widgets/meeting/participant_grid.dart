@@ -149,6 +149,24 @@ class _ParticipantGridState extends State<ParticipantGrid> {
       },
     );
 
+    _meeting.on(
+      Events.participantModeChanged,
+      (data) {
+        Map<String, Participant> _participants = {};
+        Participant _localParticipant = widget.meeting.localParticipant;
+        _participants.putIfAbsent(
+            _localParticipant.id, () => _localParticipant);
+        _participants.addAll(_meeting.participants);
+        // log("List Mode Change mode:: ${_participants[data['participantId']]?.mode.name}");
+
+        setState(() {
+          localParticipant = _localParticipant;
+          participants = _participants;
+          updateOnScreenParticipants();
+        });
+      },
+    );
+
     _meeting.on(Events.presenterChanged, (_presenterId) {
       setState(() {
         presenterId = _presenterId;
@@ -177,13 +195,16 @@ class _ParticipantGridState extends State<ParticipantGrid> {
 
   updateOnScreenParticipants() {
     Map<String, Participant> newScreenParticipants = <String, Participant>{};
-    participants.values
-        .toList()
+    List<Participant> conferenceParticipants = participants.values
+        .where((element) => element.mode == Mode.CONFERENCE)
+        .toList();
+
+    conferenceParticipants
         .sublist(
             0,
-            participants.length > numberOfMaxOnScreenParticipants
+            conferenceParticipants.length > numberOfMaxOnScreenParticipants
                 ? numberOfMaxOnScreenParticipants
-                : participants.length)
+                : conferenceParticipants.length)
         .forEach((participant) {
       newScreenParticipants.putIfAbsent(participant.id, () => participant);
     });

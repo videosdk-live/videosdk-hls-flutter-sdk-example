@@ -98,6 +98,9 @@ class _MeetingScreenState extends State<MeetingScreen> {
     _meeting.on(
       Events.roomJoined,
       () {
+        if (widget.mode == Mode.CONFERENCE) {
+          _meeting.localParticipant.pin();
+        }
         setState(() {
           meeting = _meeting;
           localParticipantMode = _meeting.localParticipant.mode;
@@ -109,6 +112,11 @@ class _MeetingScreenState extends State<MeetingScreen> {
 
     _meeting.on(Events.participantModeChanged, (Map<String, dynamic> data) {
       if (data['participantId'] == _meeting.localParticipant.id) {
+        if (_meeting.localParticipant.mode == Mode.CONFERENCE) {
+          meeting.localParticipant.pin();
+        } else {
+          meeting.localParticipant.unpin();
+        }
         setState(() {
           localParticipantMode = _meeting.localParticipant.mode;
         });

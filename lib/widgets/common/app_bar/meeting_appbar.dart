@@ -135,7 +135,18 @@ class MeetingAppBarState extends State<MeetingAppBar> {
                           message: "HLS is in starting state",
                           context: context);
                     } else {
-                      widget.meeting.startHls();
+                      Map<String, dynamic> config = {
+                        'layout': {
+                          "type": "SPOTLIGHT",
+                          "priority": "PIN",
+                          "gridSize": "4",
+                        },
+                        'theme': "DARK",
+                        'mode': "video-and-audio",
+                        'orientation': "landscape",
+                        'quality': "high",
+                      };
+                      widget.meeting.startHls(config: config);
                     }
                   }),
               // IconButton(
