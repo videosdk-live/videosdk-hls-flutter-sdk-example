@@ -38,10 +38,6 @@ class _JoinScreenState extends State<JoinScreen> {
   void initState() {
     if (widget.mode == Mode.CONFERENCE) initCameraPreview();
     super.initState();
-    // SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.portraitUp,
-    //   DeviceOrientation.portraitDown,
-    // ]);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final token = await fetchToken(context);
       setState(() {
