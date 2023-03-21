@@ -56,7 +56,6 @@ class _ChatViewState extends State<ChatView> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: secondaryColor,
-        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           flexibleSpace: Align(
             alignment: Alignment.centerLeft,

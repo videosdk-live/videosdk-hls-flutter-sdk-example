@@ -49,7 +49,10 @@ class LivestreamAppBarState extends State<LivestreamAppBar> {
           if (widget.hlsState == "HLS_STARTING" ||
               widget.hlsState == "HLS_STOPPING" ||
               widget.hlsState == "HLS_STARTED")
-            HLSIndicator(hlsState: widget.hlsState),
+            HLSIndicator(
+              hlsState: widget.hlsState,
+              isButton: false,
+            ),
           if (widget.hlsState == "HLS_STARTING" ||
               widget.hlsState == "HLS_STOPPING" ||
               widget.hlsState == "HLS_STARTED")

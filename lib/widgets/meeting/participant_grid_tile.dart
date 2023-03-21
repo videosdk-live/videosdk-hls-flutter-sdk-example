@@ -83,21 +83,6 @@ class _ParticipantGridTileState extends State<ParticipantGridTile> {
                     ),
                   ),
                 ),
-          if (audioStream == null)
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: black700,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: const Icon(
-                    Icons.mic_off,
-                    size: 15,
-                  )),
-            ),
           Positioned(
             bottom: 4,
             left: 4,
@@ -107,9 +92,28 @@ class _ParticipantGridTileState extends State<ParticipantGridTile> {
                   color: black700,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(widget.participant.isLocal
-                    ? "You"
-                    : widget.participant.displayName)),
+                child: Row(
+                  children: [
+                    Text(widget.participant.isLocal
+                        ? "You"
+                        : widget.participant.displayName),
+                    if (audioStream == null)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: black700,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const Icon(
+                              Icons.mic_off,
+                              size: 15,
+                            )),
+                      )
+                  ],
+                )),
           ),
           Positioned(
               top: 4,

@@ -3,7 +3,9 @@ import 'package:videosdk_hls_flutter_example/constants/colors.dart';
 
 class HLSIndicator extends StatefulWidget {
   final String hlsState;
-  const HLSIndicator({Key? key, required this.hlsState}) : super(key: key);
+  final bool isButton;
+  const HLSIndicator({Key? key, required this.hlsState, required this.isButton})
+      : super(key: key);
 
   @override
   State<HLSIndicator> createState() => _HLSIndicatorState();
@@ -41,12 +43,29 @@ class _HLSIndicatorState extends State<HLSIndicator>
   Widget build(BuildContext context) {
     return FadeTransition(
         opacity: _animationController,
-        // child: Lottie.asset('assets/recording_lottie.json', height: 35));
-        child: Container(
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(6)), color: red),
-            padding: const EdgeInsets.all(8),
-            child: const Text("Live")));
+        child: widget.isButton
+            ? Container(
+                decoration: BoxDecoration(
+                    border: widget.hlsState == "HLS_STOPPED"
+                        ? Border.all(color: black600)
+                        : null,
+                    borderRadius: BorderRadius.all(Radius.circular(4)),
+                    color: widget.hlsState == "HLS_STOPPED" ? null : red),
+                padding: EdgeInsets.all(8),
+                child: Text(widget.hlsState == "HLS_STOPPED"
+                    ? "Go Live"
+                    : widget.hlsState == "HLS_STARTING"
+                        ? "Starting Live"
+                        : widget.hlsState == "HLS_STARTED"
+                            ? "Stop Live"
+                            : "Stopping Live"),
+              )
+            : Container(
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(6)),
+                    color: red),
+                padding: const EdgeInsets.all(8),
+                child: const Text("Live")));
   }
 
   @override

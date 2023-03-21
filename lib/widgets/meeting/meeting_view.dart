@@ -139,7 +139,7 @@ class _MeetingViewState extends State<MeetingView> {
                   position: RelativeRect.fromLTRB(
                     screenSize.width - details.globalPosition.dx,
                     details.globalPosition.dy - bottomMargin,
-                    details.globalPosition.dx,
+                    details.globalPosition.dx + 50,
                     (bottomMargin),
                   ),
                   items: outptuDevice.map((e) {
@@ -187,8 +187,9 @@ class _MeetingViewState extends State<MeetingView> {
                 showModalBottomSheet(
                   context: context,
                   constraints: BoxConstraints(
-                      maxHeight:
-                          MediaQuery.of(context).size.height - statusbarHeight),
+                      maxHeight: MediaQuery.of(context).size.height -
+                          statusbarHeight -
+                          32),
                   isScrollControlled: true,
                   builder: (context) => ChatView(
                     key: const Key("ChatScreen"),

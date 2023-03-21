@@ -117,18 +117,9 @@ class MeetingAppBarState extends State<MeetingAppBar> {
                 ),
               ),
               MaterialButton(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                        color: red),
-                    padding: EdgeInsets.all(8),
-                    child: Text(widget.hlsState == "HLS_STOPPED"
-                        ? "Go Live"
-                        : widget.hlsState == "HLS_STARTING"
-                            ? "Starting Live"
-                            : widget.hlsState == "HLS_STARTED"
-                                ? "Live"
-                                : "Stopping Live"),
+                  child: HLSIndicator(
+                    hlsState: widget.hlsState,
+                    isButton: true,
                   ),
                   onPressed: () {
                     if (widget.hlsState == "HLS_STOPPING") {
@@ -156,18 +147,6 @@ class MeetingAppBarState extends State<MeetingAppBar> {
                       widget.meeting.startHls(config: config);
                     }
                   }),
-              // IconButton(
-              //   icon: SvgPicture.asset(
-              //     "assets/ic_switch_camera.svg",
-              //     height: 24,
-              //     width: 24,
-              //   ),
-              //   onPressed: () {
-              //     MediaDeviceInfo newCam = cameras.firstWhere((camera) =>
-              //         camera.deviceId != widget.meeting.selectedCamId);
-              //     widget.meeting.changeCam(newCam.deviceId);
-              //   },
-              // ),
             ],
           ),
         ));
