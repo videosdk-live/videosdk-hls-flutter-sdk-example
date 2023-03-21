@@ -29,9 +29,9 @@ class _ParticipantListState extends State<ParticipantList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: primaryColor,
+        backgroundColor: secondaryColor,
         flexibleSpace: Align(
           alignment: Alignment.centerLeft,
           child: Row(

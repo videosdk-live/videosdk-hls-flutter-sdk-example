@@ -53,160 +53,168 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: secondaryColor,
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        flexibleSpace: Align(
-          alignment: Alignment.centerLeft,
-          child: Row(
-            children: [
-              const Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Text(
-                    "Chat",
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-                  ),
-                ),
-              ),
-              if (widget.showClose)
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => widget.onClose(),
-                ),
-            ],
-          ),
-        ),
-        automaticallyImplyLeading: false,
+    return SafeArea(
+      child: Scaffold(
         backgroundColor: secondaryColor,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: messages == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : SingleChildScrollView(
-                        reverse: true,
-                        child: Column(
-                          children: messages!.messages
-                              .map(
-                                (e) => ChatWidget(
-                                  orientation: widget.orientation,
-                                  message: e,
-                                  isLocalParticipant: e.senderId ==
-                                      widget.meeting.localParticipant.id,
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      padding: EdgeInsets.fromLTRB(
-                          widget.orientation == Orientation.portrait ? 16 : 10,
-                          0,
-                          0,
-                          0),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: black600),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              style: TextStyle(
-                                fontSize:
-                                    widget.orientation == Orientation.portrait
-                                        ? 16
-                                        : 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              controller: msgTextController,
-                              onChanged: (value) => setState(() {
-                                msgTextController.text;
-                              }),
-                              decoration: const InputDecoration(
-                                  hintText: "Write your message",
-                                  border: InputBorder.none,
-                                  hintStyle: TextStyle(
-                                    color: black400,
-                                  )),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: msgTextController.text.trim().isEmpty
-                                ? null
-                                : () => widget.meeting.pubSub
-                                    .publish(
-                                      "CHAT",
-                                      msgTextController.text,
-                                      const PubSubPublishOptions(persist: true),
-                                    )
-                                    .then((value) => msgTextController.clear()),
-                            child: Container(
-                                padding: const EdgeInsets.all(8),
-                                width: 45,
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 0),
-                                decoration: BoxDecoration(
-                                    color: msgTextController.text.trim().isEmpty
-                                        ? null
-                                        : purple,
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: const Icon(Icons.send)),
-                          ),
-                        ],
-                      ),
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          flexibleSpace: Align(
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      "Chat",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
                     ),
                   ),
-                  if (!widget.showClose) const HorizontalSpacer(),
-                  if (!widget.showClose)
-                    TouchRippleEffect(
-                      borderRadius: BorderRadius.circular(12),
-                      rippleColor: primaryColor,
-                      onTap: () {
-                        if (!isRaisedHand) {
-                          widget.meeting.pubSub
-                              .publish("RAISE_HAND", "message");
-                          setState(() {
-                            isRaisedHand = true;
-                          });
-
-                          Timer(const Duration(seconds: 5), () {
-                            setState(() {
-                              isRaisedHand = false;
-                            });
-                          });
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: isRaisedHand
-                              ? Color.fromRGBO(255, 255, 255, 1)
-                              : Color.fromRGBO(0, 0, 0, 0.3),
+                ),
+                if (widget.showClose)
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => widget.onClose(),
+                  ),
+              ],
+            ),
+          ),
+          automaticallyImplyLeading: false,
+          backgroundColor: secondaryColor,
+          elevation: 0,
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Expanded(
+                  child: messages == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : SingleChildScrollView(
+                          reverse: true,
+                          child: Column(
+                            children: messages!.messages
+                                .map(
+                                  (e) => ChatWidget(
+                                    orientation: widget.orientation,
+                                    message: e,
+                                    isLocalParticipant: e.senderId ==
+                                        widget.meeting.localParticipant.id,
+                                  ),
+                                )
+                                .toList(),
+                          ),
                         ),
-                        padding: const EdgeInsets.all(14),
-                        child: SvgPicture.asset(
-                          "assets/ic_hand.svg",
-                          color: isRaisedHand ? Colors.black : Colors.white,
-                          height: 24,
-                          width: 24,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        padding: EdgeInsets.fromLTRB(
+                            widget.orientation == Orientation.portrait
+                                ? 16
+                                : 10,
+                            0,
+                            0,
+                            0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: black600),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                style: TextStyle(
+                                  fontSize:
+                                      widget.orientation == Orientation.portrait
+                                          ? 16
+                                          : 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                controller: msgTextController,
+                                onChanged: (value) => setState(() {
+                                  msgTextController.text;
+                                }),
+                                decoration: const InputDecoration(
+                                    hintText: "Write your message",
+                                    border: InputBorder.none,
+                                    hintStyle: TextStyle(
+                                      color: black400,
+                                    )),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: msgTextController.text.trim().isEmpty
+                                  ? null
+                                  : () => widget.meeting.pubSub
+                                      .publish(
+                                        "CHAT",
+                                        msgTextController.text,
+                                        const PubSubPublishOptions(
+                                            persist: true),
+                                      )
+                                      .then(
+                                          (value) => msgTextController.clear()),
+                              child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  width: 45,
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 0),
+                                  decoration: BoxDecoration(
+                                      color:
+                                          msgTextController.text.trim().isEmpty
+                                              ? null
+                                              : purple,
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: const Icon(Icons.send)),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                ],
-              )
-            ],
+                    if (!widget.showClose) const HorizontalSpacer(),
+                    if (!widget.showClose)
+                      TouchRippleEffect(
+                        borderRadius: BorderRadius.circular(12),
+                        rippleColor: primaryColor,
+                        onTap: () {
+                          if (!isRaisedHand) {
+                            widget.meeting.pubSub
+                                .publish("RAISE_HAND", "message");
+                            setState(() {
+                              isRaisedHand = true;
+                            });
+
+                            Timer(const Duration(seconds: 5), () {
+                              setState(() {
+                                isRaisedHand = false;
+                              });
+                            });
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: isRaisedHand
+                                ? Color.fromRGBO(255, 255, 255, 1)
+                                : Color.fromRGBO(0, 0, 0, 0.3),
+                          ),
+                          padding: const EdgeInsets.all(14),
+                          child: SvgPicture.asset(
+                            "assets/ic_hand.svg",
+                            color: isRaisedHand ? Colors.black : Colors.white,
+                            height: 24,
+                            width: 24,
+                          ),
+                        ),
+                      ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

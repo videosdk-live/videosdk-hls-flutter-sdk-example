@@ -88,7 +88,7 @@ class _ParticipantListItemState extends State<ParticipantListItem> {
                         "Host",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -141,7 +141,7 @@ class _ParticipantListItemState extends State<ParticipantListItem> {
           ),
         ),
         const Divider(
-          color: black700,
+          color: black600,
           thickness: 1.5,
         )
       ],
