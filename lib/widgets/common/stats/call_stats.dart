@@ -104,13 +104,13 @@ class _CallStatsState extends State<CallStats> {
       stats = vStats;
     }
     double packetLossPercent =
-        (stats['packetsLost'] ?? 0.0) / (stats['totalPackets'] ?? 1);
+        (stats['packetsLost'] ?? 0.0) / (stats['totalPackets'] ?? 1.0);
     if (packetLossPercent.isNaN) {
-      packetLossPercent = 0;
+      packetLossPercent = 0.0;
     }
-    double jitter = stats['jitter'] ?? 0;
-    double rtt = stats['rtt'] ?? 0;
-    double? _score = stats.isNotEmpty ? 100 : null;
+    double jitter = stats['jitter'] ?? 0.0;
+    double rtt = stats['rtt'] ?? 0.0;
+    double? _score = stats.isNotEmpty ? 100.0 : null;
     if (_score != null) {
       _score -= packetLossPercent * 50 > 50 ? 50 : packetLossPercent * 50;
       _score -= ((jitter / 30) * 25 > 25 ? 25 : (jitter / 30) * 25);

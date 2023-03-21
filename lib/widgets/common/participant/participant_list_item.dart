@@ -30,11 +30,17 @@ class _ParticipantListItemState extends State<ParticipantListItem> {
       } else if (stream.kind == 'audio') {
         audioStream = stream;
       }
-      log("Stream: " + stream.kind.toString());
     });
 
     super.initState();
     addParticipantListener(widget.participant);
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 
   @override

@@ -45,6 +45,13 @@ class MeetingAppBarState extends State<MeetingAppBar> {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedCrossFade(
         duration: const Duration(milliseconds: 300),

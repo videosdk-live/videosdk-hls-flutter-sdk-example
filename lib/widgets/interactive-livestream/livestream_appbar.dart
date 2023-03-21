@@ -1,15 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
-import 'package:videosdk_hls_flutter_example/constants/colors.dart';
-import 'package:videosdk_hls_flutter_example/utils/api.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
-import 'package:videosdk_hls_flutter_example/utils/toast.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/hls_indicator.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/recording_indicator.dart';
 
 class LivestreamAppBar extends StatefulWidget {
   final Room meeting;
