@@ -15,6 +15,7 @@ class LivestreamPlayer extends StatefulWidget {
   final bool showChat;
   final Function onChatButtonClicked;
   final Function onRaiseHandButtonClicked;
+  final Function onPlaybackEnded;
   const LivestreamPlayer({
     Key? key,
     required this.downstreamUrl,
@@ -22,6 +23,7 @@ class LivestreamPlayer extends StatefulWidget {
     required this.showChat,
     required this.onChatButtonClicked,
     required this.onRaiseHandButtonClicked,
+    required this.onPlaybackEnded,
   }) : super(key: key);
 
   @override
@@ -82,6 +84,9 @@ class LivestreamPlayerState extends State<LivestreamPlayer>
         }
         validPosition = oDuration.compareTo(oPosition) >= 0;
         sliderValue = validPosition ? oPosition.inSeconds.toDouble() : 0;
+      }
+      if (_controller.value.isEnded) {
+        widget.onPlaybackEnded();
       }
       setState(() {});
     }

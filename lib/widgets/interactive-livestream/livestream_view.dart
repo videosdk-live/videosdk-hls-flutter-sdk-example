@@ -28,6 +28,7 @@ class _LivestreamViewState extends State<LivestreamView> {
   late String hlsState;
   String? downstreamUrl;
   bool showChat = true;
+  bool isEnded = false;
 
   @override
   void initState() {
@@ -50,8 +51,9 @@ class _LivestreamViewState extends State<LivestreamView> {
       children: [
         if (downstreamUrl == null ||
             hlsState == "HLS_STARTING" ||
-            hlsState == "HLS_STOPPED")
-          WaitingForHLS(isStopped: downstreamUrl != null),
+            hlsState == "HLS_STOPPED" ||
+            isEnded)
+          WaitingForHLS(isStopped: isEnded),
         OrientationBuilder(builder: (context, orientation) {
           return Flex(
             direction: orientation == Orientation.portrait
@@ -59,7 +61,8 @@ class _LivestreamViewState extends State<LivestreamView> {
                 : Axis.horizontal,
             children: [
               if (downstreamUrl != null &&
-                  (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING"))
+                  (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING") &&
+                  !isEnded)
                 Expanded(
                   flex: orientation == Orientation.landscape ? 2 : 1,
                   child: LivestreamPlayer(
@@ -74,12 +77,17 @@ class _LivestreamViewState extends State<LivestreamView> {
                     onRaiseHandButtonClicked: () {
                       widget.meeting.pubSub.publish("RAISE_HAND", "message");
                     },
-                    // meeting: widget.meeting,
+                    onPlaybackEnded: () {
+                      setState(() {
+                        isEnded = true;
+                      });
+                    },
                   ),
                 ),
               if (downstreamUrl != null &&
                   (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING") &&
-                  (showChat || orientation == Orientation.portrait))
+                  (showChat || orientation == Orientation.portrait) &&
+                  !isEnded)
                 Expanded(
                     flex: orientation == Orientation.landscape ? 1 : 2,
                     child: ChatView(
@@ -155,6 +163,7 @@ class _LivestreamViewState extends State<LivestreamView> {
       bool isPlayable = await isHlsPlayable(url);
       setState(() {
         downstreamUrl = url;
+        isEnded = false;
       });
       timer.cancel();
     });
