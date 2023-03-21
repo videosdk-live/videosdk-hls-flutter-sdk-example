@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
+import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 
 class ParticipantListItem extends StatefulWidget {
   final Participant participant;
   final Function onMoreOptionsSelected;
+  final bool isRaisedHand;
   const ParticipantListItem(
       {Key? key,
       required this.participant,
+      required this.isRaisedHand,
       required this.onMoreOptionsSelected})
       : super(key: key);
 
@@ -95,6 +98,8 @@ class _ParticipantListItemState extends State<ParticipantListItem> {
                     ),
                 ],
               )),
+              if (widget.isRaisedHand) SvgPicture.asset("assets/ic_hand.svg"),
+              if (widget.isRaisedHand) const HorizontalSpacer(),
               Container(
                 margin: const EdgeInsets.only(right: 10),
                 padding: const EdgeInsets.all(6),

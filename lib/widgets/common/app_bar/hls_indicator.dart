@@ -47,18 +47,21 @@ class _HLSIndicatorState extends State<HLSIndicator>
             ? Container(
                 decoration: BoxDecoration(
                     border: widget.hlsState == "HLS_STOPPED"
-                        ? Border.all(color: black600)
+                        ? Border.all(color: secondaryColor)
                         : null,
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                     color: widget.hlsState == "HLS_STOPPED" ? null : red),
-                padding: EdgeInsets.all(8),
-                child: Text(widget.hlsState == "HLS_STOPPED"
-                    ? "Go Live"
-                    : widget.hlsState == "HLS_STARTING"
-                        ? "Starting Live"
-                        : widget.hlsState == "HLS_STARTED"
-                            ? "Stop Live"
-                            : "Stopping Live"),
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  widget.hlsState == "HLS_STOPPED"
+                      ? "Go Live"
+                      : widget.hlsState == "HLS_STARTING"
+                          ? "Starting Live"
+                          : widget.hlsState == "HLS_STARTED"
+                              ? "Stop Live"
+                              : "Stopping Live",
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
               )
             : Container(
                 decoration: const BoxDecoration(

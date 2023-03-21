@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
+import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/stats/call_stats.dart';
 
 class ParticipantGridTile extends StatefulWidget {
@@ -89,7 +90,7 @@ class _ParticipantGridTileState extends State<ParticipantGridTile> {
             child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: black700,
+                  color: black700.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -97,12 +98,13 @@ class _ParticipantGridTileState extends State<ParticipantGridTile> {
                     Text(widget.participant.isLocal
                         ? "You"
                         : widget.participant.displayName),
+                    if (audioStream == null) const HorizontalSpacer(4),
                     if (audioStream == null)
                       Positioned(
                         top: 8,
                         right: 8,
                         child: Container(
-                            padding: const EdgeInsets.all(4),
+                            // padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               color: black700,
                               borderRadius: BorderRadius.circular(30),
@@ -117,7 +119,7 @@ class _ParticipantGridTileState extends State<ParticipantGridTile> {
           ),
           Positioned(
               top: 4,
-              left: 4,
+              right: 4,
               child: CallStats(participant: widget.participant)),
         ],
       ),

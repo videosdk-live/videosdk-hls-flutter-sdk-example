@@ -22,8 +22,6 @@ class MeetingView extends StatefulWidget {
 
 class _MeetingViewState extends State<MeetingView> {
   bool showChatSnackbar = true;
-  String recordingState = "RECORDING_STOPPED";
-  String hlsState = "HLS_STOPPED";
 
   // Streams
   Stream? shareStream;
@@ -37,9 +35,6 @@ class _MeetingViewState extends State<MeetingView> {
   void initState() {
     super.initState();
     // Register meeting events
-    recordingState = widget.meeting.recordingState;
-    hlsState = widget.meeting.hlsState;
-
     registerMeetingEvents(widget.meeting);
     subscribeToChatMessages(widget.meeting);
   }
@@ -63,8 +58,6 @@ class _MeetingViewState extends State<MeetingView> {
           MeetingAppBar(
             meeting: widget.meeting,
             token: widget.token,
-            recordingState: recordingState,
-            hlsState: hlsState,
             isFullScreen: fullScreen,
           ),
           Expanded(
@@ -99,8 +92,6 @@ class _MeetingViewState extends State<MeetingView> {
               isMicEnabled: audioStream != null,
               isCamEnabled: videoStream != null,
               isScreenShareEnabled: shareStream != null,
-              recordingState: recordingState,
-              hlsState: hlsState,
               // Called when Call End button is pressed
               onCallEndButtonPressed: () {
                 widget.meeting.end();
@@ -208,41 +199,17 @@ class _MeetingViewState extends State<MeetingView> {
               },
 
               // Called when more options button is pressed
-              onMoreOptionSelected: (option) {
-                // Showing more options dialog box
-                if (option == "screenshare") {
-                  if (remoteParticipantShareStream == null) {
-                    if (shareStream == null) {
-                      widget.meeting.enableScreenShare();
-                    } else {
-                      widget.meeting.disableScreenShare();
-                    }
+              onScreenShareButtonPressed: () {
+                if (remoteParticipantShareStream == null) {
+                  if (shareStream == null) {
+                    widget.meeting.enableScreenShare();
                   } else {
-                    showSnackBarMessage(
-                        message: "Someone is already presenting",
-                        context: context);
+                    widget.meeting.disableScreenShare();
                   }
-                } else if (option == "recording") {
-                  if (recordingState == "RECORDING_STOPPING") {
-                    showSnackBarMessage(
-                        message: "Recording is in stopping state",
-                        context: context);
-                  } else if (recordingState == "RECORDING_STARTED") {
-                    widget.meeting.stopRecording();
-                  } else if (recordingState == "RECORDING_STARTING") {
-                    showSnackBarMessage(
-                        message: "Recording is in starting state",
-                        context: context);
-                  } else {
-                    widget.meeting.startRecording();
-                  }
-                } else if (option == "participants") {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: false,
-                    builder: (context) =>
-                        ParticipantList(meeting: widget.meeting),
-                  );
+                } else {
+                  showSnackBarMessage(
+                      message: "Someone is already presenting",
+                      context: context);
                 }
               },
             ),
@@ -253,32 +220,6 @@ class _MeetingViewState extends State<MeetingView> {
   }
 
   void registerMeetingEvents(Room _meeting) {
-    // Called when recording is started
-    _meeting.on(Events.recordingStateChanged, (String status) {
-      if (mounted) {
-        showSnackBarMessage(
-            message:
-                "Meeting recording ${status == "RECORDING_STARTING" ? "is starting" : status == "RECORDING_STARTED" ? "started" : status == "RECORDING_STOPPING" ? "is stopping" : "stopped"}",
-            context: context);
-      }
-      setState(() {
-        recordingState = status;
-      });
-    });
-
-    // Called when hls is started
-    _meeting.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
-      if (mounted) {
-        showSnackBarMessage(
-            message:
-                "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : data['status'] == "HLS_STARTED" ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
-            context: context);
-      }
-      setState(() {
-        hlsState = data['status'];
-      });
-    });
-
     // Called when stream is enabled
     _meeting.localParticipant.on(Events.streamEnabled, (Stream _stream) {
       if (_stream.kind == 'video') {

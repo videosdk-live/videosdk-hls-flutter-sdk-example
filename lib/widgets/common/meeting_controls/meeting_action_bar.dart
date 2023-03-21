@@ -9,16 +9,14 @@ import '../../../constants/colors.dart';
 class MeetingActionBar extends StatelessWidget {
   // control states
   final bool isMicEnabled, isCamEnabled, isScreenShareEnabled;
-  final String recordingState, hlsState;
 
   // callback functions
   final void Function() onCallEndButtonPressed,
       onCallLeaveButtonPressed,
       onMicButtonPressed,
       onCameraButtonPressed,
-      onChatButtonPressed;
-
-  final void Function(String) onMoreOptionSelected;
+      onChatButtonPressed,
+      onScreenShareButtonPressed;
 
   final void Function(TapDownDetails) onSwitchMicButtonPressed;
   final void Function(TapDownDetails) onSwitchCameraButtonPressed;
@@ -27,14 +25,12 @@ class MeetingActionBar extends StatelessWidget {
       required this.isMicEnabled,
       required this.isCamEnabled,
       required this.isScreenShareEnabled,
-      required this.recordingState,
-      required this.hlsState,
       required this.onCallEndButtonPressed,
       required this.onCallLeaveButtonPressed,
       required this.onMicButtonPressed,
       required this.onSwitchMicButtonPressed,
       required this.onCameraButtonPressed,
-      required this.onMoreOptionSelected,
+      required this.onScreenShareButtonPressed,
       required this.onChatButtonPressed,
       required this.onSwitchCameraButtonPressed})
       : super(key: key);
@@ -179,57 +175,25 @@ class MeetingActionBar extends StatelessWidget {
             ),
           ),
           const HorizontalSpacer(8),
-
-          // More options
-          PopupMenuButton(
-              position: PopupMenuPosition.under,
-              padding: const EdgeInsets.all(0),
-              color: black700,
-              icon: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: secondaryColor),
-                  // color: red,
-                ),
-                padding: const EdgeInsets.all(10),
-                child: const Icon(
-                  Icons.more_vert,
-                  size: 26,
-                  color: Colors.white,
-                ),
-              ),
-              shape: RoundedRectangleBorder(
+          TouchRippleEffect(
+            borderRadius: BorderRadius.circular(12),
+            rippleColor: primaryColor,
+            onTap: onScreenShareButtonPressed,
+            child: Container(
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: secondaryColor),
+                color: isScreenShareEnabled ? Colors.white : primaryColor,
               ),
-              onSelected: (value) => {onMoreOptionSelected(value.toString())},
-              itemBuilder: (context) => <PopupMenuEntry>[
-                    _buildMeetingPoupItem(
-                      "recording",
-                      recordingState == "RECORDING_STARTED"
-                          ? "Stop Recording"
-                          : recordingState == "RECORDING_STARTING"
-                              ? "Recording is starting"
-                              : "Start Recording",
-                      null,
-                      SvgPicture.asset("assets/ic_recording.svg"),
-                    ),
-                    const PopupMenuDivider(),
-                    _buildMeetingPoupItem(
-                      "screenshare",
-                      isScreenShareEnabled
-                          ? "Stop Screen Share"
-                          : "Start Screen Share",
-                      null,
-                      SvgPicture.asset("assets/ic_screen_share.svg"),
-                    ),
-                    const PopupMenuDivider(),
-                    _buildMeetingPoupItem(
-                      "participants",
-                      "Participants",
-                      null,
-                      SvgPicture.asset("assets/ic_participants.svg"),
-                    ),
-                  ]),
+              padding: const EdgeInsets.all(11),
+              child: SvgPicture.asset(
+                "assets/ic_screen_share.svg",
+                width: 24,
+                height: 24,
+                color: isScreenShareEnabled ? primaryColor : Colors.white,
+              ),
+            ),
+          ),
         ],
       ),
     );

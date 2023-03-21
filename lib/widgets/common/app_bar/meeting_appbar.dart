@@ -9,21 +9,18 @@ import 'package:videosdk_hls_flutter_example/utils/api.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/hls_indicator.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/recording_indicator.dart';
+import 'package:touch_ripple_effect/touch_ripple_effect.dart';
+import 'package:videosdk_hls_flutter_example/widgets/common/participant/participant_list.dart';
 
 class MeetingAppBar extends StatefulWidget {
   final String token;
   final Room meeting;
-  final String recordingState;
-  final String hlsState;
   final bool isFullScreen;
   const MeetingAppBar(
       {Key? key,
       required this.meeting,
       required this.token,
-      required this.isFullScreen,
-      required this.recordingState,
-      required this.hlsState})
+      required this.isFullScreen})
       : super(key: key);
 
   @override
@@ -34,13 +31,19 @@ class MeetingAppBarState extends State<MeetingAppBar> {
   Duration? elapsedTime;
   Timer? sessionTimer;
 
-  List<MediaDeviceInfo> cameras = [];
+  String hlsState = "HLS_STOPPED";
+  Map<String, Participant> _participants = {};
 
   @override
   void initState() {
     startTimer();
-    // Holds available cameras info
-    cameras = widget.meeting.getCameras();
+    hlsState = widget.meeting.hlsState;
+
+    _participants.putIfAbsent(widget.meeting.localParticipant.id,
+        () => widget.meeting.localParticipant);
+    _participants.addAll(widget.meeting.participants);
+
+    addMeetingListener(widget.meeting);
     super.initState();
   }
 
@@ -63,14 +66,6 @@ class MeetingAppBarState extends State<MeetingAppBar> {
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
           child: Row(
             children: [
-              if (widget.recordingState == "RECORDING_STARTING" ||
-                  widget.recordingState == "RECORDING_STOPPING" ||
-                  widget.recordingState == "RECORDING_STARTED")
-                RecordingIndicator(recordingState: widget.recordingState),
-              if (widget.recordingState == "RECORDING_STARTING" ||
-                  widget.recordingState == "RECORDING_STOPPING" ||
-                  widget.recordingState == "RECORDING_STARTED")
-                const HorizontalSpacer(),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -82,7 +77,7 @@ class MeetingAppBarState extends State<MeetingAppBar> {
                           widget.meeting.id,
                           style: const TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                         GestureDetector(
@@ -116,19 +111,19 @@ class MeetingAppBarState extends State<MeetingAppBar> {
                   ],
                 ),
               ),
-              MaterialButton(
+              TouchRippleEffect(
                   child: HLSIndicator(
-                    hlsState: widget.hlsState,
+                    hlsState: hlsState,
                     isButton: true,
                   ),
-                  onPressed: () {
-                    if (widget.hlsState == "HLS_STOPPING") {
+                  onTap: () {
+                    if (hlsState == "HLS_STOPPING") {
                       showSnackBarMessage(
                           message: "HLS is in stopping state",
                           context: context);
-                    } else if (widget.hlsState == "HLS_STARTED") {
+                    } else if (hlsState == "HLS_STARTED") {
                       widget.meeting.stopHls();
-                    } else if (widget.hlsState == "HLS_STARTING") {
+                    } else if (hlsState == "HLS_STARTING") {
                       showSnackBarMessage(
                           message: "HLS is in starting state",
                           context: context);
@@ -147,6 +142,39 @@ class MeetingAppBarState extends State<MeetingAppBar> {
                       widget.meeting.startHls(config: config);
                     }
                   }),
+              const HorizontalSpacer(),
+              TouchRippleEffect(
+                borderRadius: BorderRadius.circular(12),
+                rippleColor: primaryColor,
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: false,
+                    builder: (context) =>
+                        ParticipantList(meeting: widget.meeting),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: secondaryColor),
+                    color: primaryColor,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        "assets/ic_participants.svg",
+                        width: 22,
+                        height: 22,
+                        color: Colors.white,
+                      ),
+                      const HorizontalSpacer(4),
+                      Text(widget.meeting.participants.length.toString()),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ));
@@ -178,5 +206,36 @@ class MeetingAppBarState extends State<MeetingAppBar> {
       sessionTimer!.cancel();
     }
     super.dispose();
+  }
+
+  void addMeetingListener(Room meeting) {
+    meeting.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
+      if (mounted) {
+        showSnackBarMessage(
+            message:
+                "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : data['status'] == "HLS_STARTED" ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
+            context: context);
+      }
+      setState(() {
+        hlsState = data['status'];
+      });
+    });
+
+    meeting.on(Events.participantJoined, (participant) {
+      if (mounted) {
+        final newParticipants = _participants;
+        newParticipants[participant.id] = participant;
+        setState(() => _participants = newParticipants);
+      }
+    });
+
+    meeting.on(Events.participantLeft, (participantId) {
+      if (mounted) {
+        final newParticipants = _participants;
+        newParticipants.remove(participantId);
+
+        setState(() => _participants = newParticipants);
+      }
+    });
   }
 }

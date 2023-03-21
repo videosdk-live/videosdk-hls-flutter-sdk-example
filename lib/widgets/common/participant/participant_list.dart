@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -16,6 +17,7 @@ class ParticipantList extends StatefulWidget {
 
 class _ParticipantListState extends State<ParticipantList> {
   Map<String, Participant> _participants = {};
+  List<String> raisedHandParticipant = [];
 
   @override
   void initState() {
@@ -23,6 +25,7 @@ class _ParticipantListState extends State<ParticipantList> {
         () => widget.meeting.localParticipant);
     _participants.addAll(widget.meeting.participants);
     addMeetingListeners(widget.meeting);
+    addRaiseHandListener(widget.meeting);
     super.initState();
   }
 
@@ -66,6 +69,8 @@ class _ParticipantListState extends State<ParticipantList> {
                 itemCount: _participants.values.length,
                 itemBuilder: (context, index) => ParticipantListItem(
                   participant: _participants.values.elementAt(index),
+                  isRaisedHand: raisedHandParticipant
+                      .contains(_participants.values.elementAt(index).id),
                   onMoreOptionsSelected: (value) {
                     if (value == "Remove from Co-host" ||
                         value == "Add as a Co-host") {
@@ -119,6 +124,21 @@ class _ParticipantListState extends State<ParticipantList> {
 
         setState(() => _participants = newParticipants);
       }
+    });
+  }
+
+  void addRaiseHandListener(Room meeting) {
+    meeting.pubSub.subscribe("RAISE_HAND", (message) {
+      List<String> participants = raisedHandParticipant;
+      setState(() {
+        participants.add(message.senderId);
+      });
+      Timer(Duration(seconds: 5), () {
+        List<String> participants = raisedHandParticipant;
+        setState(() {
+          participants.remove(message.senderId);
+        });
+      });
     });
   }
 }
