@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:touch_ripple_effect/touch_ripple_effect.dart';
@@ -30,6 +32,7 @@ class _ChatViewState extends State<ChatView> {
 
   // PubSubMessages
   PubSubMessages? messages;
+  bool isRaisedHand = false;
 
   @override
   void initState() {
@@ -170,17 +173,30 @@ class _ChatViewState extends State<ChatView> {
                     borderRadius: BorderRadius.circular(12),
                     rippleColor: primaryColor,
                     onTap: () {
-                      widget.meeting.pubSub.publish("RAISE_HAND", "");
+                      if (!isRaisedHand) {
+                        widget.meeting.pubSub.publish("RAISE_HAND", "message");
+                        setState(() {
+                          isRaisedHand = true;
+                        });
+
+                        Timer(const Duration(seconds: 5), () {
+                          setState(() {
+                            isRaisedHand = false;
+                          });
+                        });
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Color.fromRGBO(0, 0, 0, 0.3),
+                        color: isRaisedHand
+                            ? Color.fromRGBO(255, 255, 255, 1)
+                            : Color.fromRGBO(0, 0, 0, 0.3),
                       ),
                       padding: const EdgeInsets.all(14),
                       child: SvgPicture.asset(
                         "assets/ic_hand.svg",
-                        color: Colors.white,
+                        color: isRaisedHand ? Colors.black : Colors.white,
                         height: 24,
                         width: 24,
                       ),
