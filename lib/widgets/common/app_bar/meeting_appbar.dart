@@ -112,6 +112,7 @@ class MeetingAppBarState extends State<MeetingAppBar> {
                 ),
               ),
               TouchRippleEffect(
+                  rippleColor: primaryColor,
                   child: HLSIndicator(
                     hlsState: hlsState,
                     isButton: true,
