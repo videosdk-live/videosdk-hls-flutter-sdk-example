@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
+import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 
 void showSnackBarMessage(
     {required String message,
@@ -15,6 +16,7 @@ void showSnackBarMessage(
       content: Row(
         children: [
           if (icon != null) icon,
+          if (icon != null) const HorizontalSpacer(),
           Flexible(
             child: Text(
               message,

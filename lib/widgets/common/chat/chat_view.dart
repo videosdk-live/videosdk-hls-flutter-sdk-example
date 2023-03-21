@@ -168,40 +168,42 @@ class _ChatViewState extends State<ChatView> {
                       ),
                     ),
                   ),
-                  const HorizontalSpacer(),
-                  TouchRippleEffect(
-                    borderRadius: BorderRadius.circular(12),
-                    rippleColor: primaryColor,
-                    onTap: () {
-                      if (!isRaisedHand) {
-                        widget.meeting.pubSub.publish("RAISE_HAND", "message");
-                        setState(() {
-                          isRaisedHand = true;
-                        });
-
-                        Timer(const Duration(seconds: 5), () {
+                  if (!widget.showClose) const HorizontalSpacer(),
+                  if (!widget.showClose)
+                    TouchRippleEffect(
+                      borderRadius: BorderRadius.circular(12),
+                      rippleColor: primaryColor,
+                      onTap: () {
+                        if (!isRaisedHand) {
+                          widget.meeting.pubSub
+                              .publish("RAISE_HAND", "message");
                           setState(() {
-                            isRaisedHand = false;
+                            isRaisedHand = true;
                           });
-                        });
-                      }
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: isRaisedHand
-                            ? Color.fromRGBO(255, 255, 255, 1)
-                            : Color.fromRGBO(0, 0, 0, 0.3),
-                      ),
-                      padding: const EdgeInsets.all(14),
-                      child: SvgPicture.asset(
-                        "assets/ic_hand.svg",
-                        color: isRaisedHand ? Colors.black : Colors.white,
-                        height: 24,
-                        width: 24,
+
+                          Timer(const Duration(seconds: 5), () {
+                            setState(() {
+                              isRaisedHand = false;
+                            });
+                          });
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: isRaisedHand
+                              ? Color.fromRGBO(255, 255, 255, 1)
+                              : Color.fromRGBO(0, 0, 0, 0.3),
+                        ),
+                        padding: const EdgeInsets.all(14),
+                        child: SvgPicture.asset(
+                          "assets/ic_hand.svg",
+                          color: isRaisedHand ? Colors.black : Colors.white,
+                          height: 24,
+                          width: 24,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               )
             ],
