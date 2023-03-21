@@ -45,6 +45,13 @@ class _LivestreamViewState extends State<LivestreamView> {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       // mainAxisSize: MainAxisSize.max,
