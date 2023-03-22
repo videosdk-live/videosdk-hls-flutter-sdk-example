@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/stats/call_stats.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/stats/call_stats.dart';
 
 class ParticipantGridTile extends StatefulWidget {
   final Participant participant;
@@ -100,19 +100,13 @@ class _ParticipantGridTileState extends State<ParticipantGridTile> {
                         : widget.participant.displayName),
                     if (audioStream == null) const HorizontalSpacer(4),
                     if (audioStream == null)
-                      Positioned(
+                      const Positioned(
                         top: 8,
                         right: 8,
-                        child: Container(
-                            // padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: black700,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: const Icon(
-                              Icons.mic_off,
-                              size: 15,
-                            )),
+                        child: Icon(
+                          Icons.mic_off,
+                          size: 15,
+                        ),
                       )
                   ],
                 )),

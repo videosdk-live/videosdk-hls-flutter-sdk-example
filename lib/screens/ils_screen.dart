@@ -1,17 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
-import 'package:videosdk_hls_flutter_example/navigator_key.dart';
 import 'package:videosdk_hls_flutter_example/screens/home_screen.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/joining/waiting_to_join.dart';
-import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_view.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/meeting_view.dart';
+import 'package:videosdk_hls_flutter_example/widgets/viewer/viewer_view.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/speaker_view.dart';
 
 class ILSScreen extends StatefulWidget {
   final String meetingId, token, displayName;
@@ -85,8 +82,8 @@ class _ILSScreenState extends State<ILSScreen> {
               child: Scaffold(
                   backgroundColor: Theme.of(context).primaryColor,
                   body: localParticipantMode == Mode.CONFERENCE
-                      ? MeetingView(meeting: meeting, token: widget.token)
-                      : LivestreamView(
+                      ? SpeakerView(meeting: meeting, token: widget.token)
+                      : ViewerView(
                           meeting: meeting,
                         )))
           : const WaitingToJoin(),

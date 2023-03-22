@@ -9,22 +9,22 @@ import 'package:videosdk_hls_flutter_example/utils/api.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/chat/chat_view.dart';
-import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_appbar.dart';
-import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_player.dart';
-import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/waiting_for_hls.dart';
+import 'package:videosdk_hls_flutter_example/widgets/viewer/viewer_appbar.dart';
+import 'package:videosdk_hls_flutter_example/widgets/viewer/livestream_player.dart';
+import 'package:videosdk_hls_flutter_example/widgets/viewer/waiting_for_hls.dart';
 
-class LivestreamView extends StatefulWidget {
+class ViewerView extends StatefulWidget {
   final Room meeting;
-  const LivestreamView({
+  const ViewerView({
     super.key,
     required this.meeting,
   });
 
   @override
-  State<LivestreamView> createState() => _LivestreamViewState();
+  State<ViewerView> createState() => _ViewerViewState();
 }
 
-class _LivestreamViewState extends State<LivestreamView> {
+class _ViewerViewState extends State<ViewerView> {
   bool showChatSnackbar = true;
 
   late String hlsState;
@@ -126,7 +126,7 @@ class _LivestreamViewState extends State<LivestreamView> {
             ],
           ),
           if (showOverlay || orientation == Orientation.portrait)
-            LivestreamAppBar(
+            ViewerAppBar(
               participantCount: participants,
               hlsState: hlsState,
               onLeaveButtonPressed: () {

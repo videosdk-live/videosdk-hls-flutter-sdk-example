@@ -5,7 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_list/participant_list_item.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/participant_list/participant_list_item.dart';
 
 class ParticipantList extends StatefulWidget {
   final Room meeting;

@@ -120,28 +120,31 @@ class _ParticipantListItemState extends State<ParticipantListItem> {
                     ? "assets/ic_video.svg"
                     : "assets/ic_video_off.svg"),
               ),
-              PopupMenuButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  color: black700,
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: Colors.white,
-                  ),
-                  onSelected: (value) {
-                    widget.onMoreOptionsSelected(value);
-                  },
-                  itemBuilder: (context) {
-                    return {
-                      '${widget.participant.mode == Mode.VIEWER ? "Add as a Co-host" : "Remove from Co-host"}',
-                      'Remove Participant'
-                    }.map((String choice) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Text(choice),
-                      );
-                    }).toList();
-                  }),
+              if (!widget.participant.isLocal)
+                PopupMenuButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    color: black700,
+                    icon: const Icon(
+                      Icons.more_vert,
+                      color: Colors.white,
+                    ),
+                    onSelected: (value) {
+                      widget.onMoreOptionsSelected(value);
+                    },
+                    itemBuilder: (context) {
+                      return {
+                        (widget.participant.mode == Mode.VIEWER
+                            ? "Add as a Co-host"
+                            : "Remove from Co-host"),
+                        'Remove Participant'
+                      }.map((String choice) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Text(choice),
+                        );
+                      }).toList();
+                    }),
             ],
           ),
         ),

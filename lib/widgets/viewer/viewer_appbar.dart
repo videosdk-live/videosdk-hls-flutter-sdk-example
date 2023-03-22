@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/hls_indicator.dart';
 
-class LivestreamAppBar extends StatelessWidget {
+class ViewerAppBar extends StatelessWidget {
   final String hlsState;
   final int participantCount;
   final Function onLeaveButtonPressed;
-  const LivestreamAppBar(
+  const ViewerAppBar(
       {Key? key,
       required this.participantCount,
       required this.hlsState,

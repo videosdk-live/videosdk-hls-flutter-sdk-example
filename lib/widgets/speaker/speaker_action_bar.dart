@@ -6,7 +6,7 @@ import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import '../../constants/colors.dart';
 
 // Meeting ActionBar
-class MeetingActionBar extends StatelessWidget {
+class SpeakerActionBar extends StatelessWidget {
   // control states
   final bool isMicEnabled, isCamEnabled, isScreenShareEnabled;
 
@@ -20,7 +20,7 @@ class MeetingActionBar extends StatelessWidget {
 
   final void Function(TapDownDetails) onSwitchMicButtonPressed;
   final void Function(TapDownDetails) onSwitchCameraButtonPressed;
-  const MeetingActionBar(
+  const SpeakerActionBar(
       {Key? key,
       required this.isMicEnabled,
       required this.isCamEnabled,

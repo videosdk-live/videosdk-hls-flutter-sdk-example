@@ -10,13 +10,13 @@ import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/hls_indicator.dart';
 import 'package:touch_ripple_effect/touch_ripple_effect.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_list/participant_list.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/participant_list/participant_list.dart';
 
-class MeetingAppBar extends StatefulWidget {
+class SpeakerAppBar extends StatefulWidget {
   final String token;
   final Room meeting;
   final bool isFullScreen;
-  const MeetingAppBar(
+  const SpeakerAppBar(
       {Key? key,
       required this.meeting,
       required this.token,
@@ -24,10 +24,10 @@ class MeetingAppBar extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<MeetingAppBar> createState() => MeetingAppBarState();
+  State<SpeakerAppBar> createState() => SpeakerAppBarState();
 }
 
-class MeetingAppBarState extends State<MeetingAppBar> {
+class SpeakerAppBarState extends State<SpeakerAppBar> {
   Duration? elapsedTime;
   Timer? sessionTimer;
 
@@ -171,7 +171,7 @@ class MeetingAppBarState extends State<MeetingAppBar> {
                         color: Colors.white,
                       ),
                       const HorizontalSpacer(4),
-                      Text(widget.meeting.participants.length.toString()),
+                      Text(_participants.length.toString()),
                     ],
                   ),
                 ),

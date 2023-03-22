@@ -3,24 +3,23 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_list/participant_list.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/meeting_action_bar.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_grid.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/screenshare_view.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/speaker_action_bar.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/grid/participant_grid.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/screenshare_view.dart';
 
-import 'package:videosdk_hls_flutter_example/widgets/meeting/meeting_appbar.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/speaker_appbar.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/chat/chat_view.dart';
 
-class MeetingView extends StatefulWidget {
+class SpeakerView extends StatefulWidget {
   final Room meeting;
   final String token;
-  const MeetingView({super.key, required this.meeting, required this.token});
+  const SpeakerView({super.key, required this.meeting, required this.token});
 
   @override
-  State<MeetingView> createState() => _MeetingViewState();
+  State<SpeakerView> createState() => _SpeakerViewState();
 }
 
-class _MeetingViewState extends State<MeetingView> {
+class _SpeakerViewState extends State<SpeakerView> {
   bool showChatSnackbar = true;
 
   // Streams
@@ -55,7 +54,7 @@ class _MeetingViewState extends State<MeetingView> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          MeetingAppBar(
+          SpeakerAppBar(
             meeting: widget.meeting,
             token: widget.token,
             isFullScreen: fullScreen,
@@ -88,7 +87,7 @@ class _MeetingViewState extends State<MeetingView> {
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
             secondChild: const SizedBox.shrink(),
-            firstChild: MeetingActionBar(
+            firstChild: SpeakerActionBar(
               isMicEnabled: audioStream != null,
               isCamEnabled: videoStream != null,
               isScreenShareEnabled: shareStream != null,

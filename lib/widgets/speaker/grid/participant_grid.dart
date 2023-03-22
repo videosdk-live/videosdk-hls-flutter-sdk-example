@@ -1,9 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
-import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_grid_tile.dart';
+import 'package:videosdk_hls_flutter_example/widgets/speaker/grid/participant_grid_tile.dart';
 
 class ParticipantGrid extends StatefulWidget {
   final Room meeting;
