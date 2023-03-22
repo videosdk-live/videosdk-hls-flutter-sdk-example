@@ -100,13 +100,9 @@ class _ParticipantGridTileState extends State<ParticipantGridTile> {
                         : widget.participant.displayName),
                     if (audioStream == null) const HorizontalSpacer(4),
                     if (audioStream == null)
-                      const Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Icon(
-                          Icons.mic_off,
-                          size: 15,
-                        ),
+                      const Icon(
+                        Icons.mic_off,
+                        size: 15,
                       )
                   ],
                 )),
