@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:videosdk/videosdk.dart';
-import 'package:videosdk_hls_flutter_example/screens/meeting_screen.dart';
+import 'package:videosdk_hls_flutter_example/screens/ils_screen.dart';
 import 'package:videosdk_hls_flutter_example/utils/api.dart';
 
 import '../constants/colors.dart';
@@ -9,18 +9,16 @@ import '../utils/spacer.dart';
 import '../utils/toast.dart';
 
 // Join Screen
-class JoinScreen extends StatefulWidget {
+class SpeakerJoinScreen extends StatefulWidget {
   final bool isCreateMeeting;
-  final Mode mode;
-  const JoinScreen(
-      {Key? key, required this.isCreateMeeting, required this.mode})
+  const SpeakerJoinScreen({Key? key, required this.isCreateMeeting})
       : super(key: key);
 
   @override
-  State<JoinScreen> createState() => _JoinScreenState();
+  State<SpeakerJoinScreen> createState() => _SpeakerJoinScreenState();
 }
 
-class _JoinScreenState extends State<JoinScreen> {
+class _SpeakerJoinScreenState extends State<SpeakerJoinScreen> {
   String _token = "";
 
   // Control Status
@@ -36,7 +34,7 @@ class _JoinScreenState extends State<JoinScreen> {
       TextEditingController(text: "Rajan Flutter");
   @override
   void initState() {
-    if (widget.mode == Mode.CONFERENCE) initCameraPreview();
+    initCameraPreview();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final token = await fetchToken(context);
@@ -65,10 +63,8 @@ class _JoinScreenState extends State<JoinScreen> {
       backgroundColor: primaryColor,
       appBar: AppBar(
         title: Text(
-          widget.isCreateMeeting
-              ? "Create Meeting"
-              : "Join as a ${widget.mode == Mode.CONFERENCE ? "speaker" : "viewer"}",
-          style: TextStyle(fontSize: 20),
+          widget.isCreateMeeting ? "Create Meeting" : "Join as a speaker",
+          style: const TextStyle(fontSize: 20),
           textAlign: TextAlign.center,
         ),
       ),
@@ -83,77 +79,76 @@ class _JoinScreenState extends State<JoinScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Camera Preview
-              if (widget.mode == Mode.CONFERENCE)
-                SizedBox(
-                  height: 300,
-                  width: 200,
-                  child: Stack(
-                    alignment: Alignment.topCenter,
-                    children: [
-                      if (cameraRenderer != null)
-                        SizedBox(
-                          height: 300,
-                          width: 200,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: RTCVideoView(
-                              cameraRenderer as RTCVideoRenderer,
-                              objectFit: RTCVideoViewObjectFit
-                                  .RTCVideoViewObjectFitCover,
-                            ),
-                          ),
-                        ),
-                      Positioned(
-                        bottom: 16,
-
-                        // Meeting ActionBar
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Mic Action Button
-                              ElevatedButton(
-                                onPressed: () => setState(
-                                  () => isMicOn = !isMicOn,
-                                ),
-                                child: Icon(isMicOn ? Icons.mic : Icons.mic_off,
-                                    color: isMicOn ? grey : Colors.white),
-                                style: ElevatedButton.styleFrom(
-                                  shape: const CircleBorder(),
-                                  padding: const EdgeInsets.all(12),
-                                  primary: isMicOn ? Colors.white : red,
-                                  onPrimary: Colors.black,
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (isCameraOn) {
-                                    disposeCameraPreview();
-                                  } else {
-                                    initCameraPreview();
-                                  }
-                                  setState(() => isCameraOn = !isCameraOn);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  shape: const CircleBorder(),
-                                  padding: const EdgeInsets.all(12),
-                                  primary: isCameraOn ? Colors.white : red,
-                                ),
-                                child: Icon(
-                                  isCameraOn
-                                      ? Icons.videocam
-                                      : Icons.videocam_off,
-                                  color: isCameraOn ? grey : Colors.white,
-                                ),
-                              ),
-                            ],
+              SizedBox(
+                height: 300,
+                width: 200,
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    if (cameraRenderer != null)
+                      SizedBox(
+                        height: 300,
+                        width: 200,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: RTCVideoView(
+                            cameraRenderer as RTCVideoRenderer,
+                            objectFit: RTCVideoViewObjectFit
+                                .RTCVideoViewObjectFitCover,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    Positioned(
+                      bottom: 16,
+
+                      // Meeting ActionBar
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Mic Action Button
+                            ElevatedButton(
+                              onPressed: () => setState(
+                                () => isMicOn = !isMicOn,
+                              ),
+                              child: Icon(isMicOn ? Icons.mic : Icons.mic_off,
+                                  color: isMicOn ? grey : Colors.white),
+                              style: ElevatedButton.styleFrom(
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(12),
+                                primary: isMicOn ? Colors.white : red,
+                                onPrimary: Colors.black,
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                if (isCameraOn) {
+                                  disposeCameraPreview();
+                                } else {
+                                  initCameraPreview();
+                                }
+                                setState(() => isCameraOn = !isCameraOn);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(12),
+                                primary: isCameraOn ? Colors.white : red,
+                              ),
+                              child: Icon(
+                                isCameraOn
+                                    ? Icons.videocam
+                                    : Icons.videocam_off,
+                                color: isCameraOn ? grey : Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(36.0),
                 child: Column(
@@ -241,8 +236,8 @@ class _JoinScreenState extends State<JoinScreen> {
                         child: Text(
                             widget.isCreateMeeting
                                 ? "Create Meeting"
-                                : "Join as a ${widget.mode == Mode.CONFERENCE ? "speaker" : "viewer"}",
-                            style: TextStyle(fontSize: 16)),
+                                : "Join as a speaker",
+                            style: const TextStyle(fontSize: 16)),
                         onPressed: () => {joinMeeting()}),
                   ],
                 ),
@@ -287,13 +282,13 @@ class _JoinScreenState extends State<JoinScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MeetingScreen(
+          builder: (context) => ILSScreen(
             token: _token,
             meetingId: _meetingId,
             displayName: _name,
             micEnabled: isMicOn,
             camEnabled: isCameraOn,
-            mode: widget.mode,
+            mode: Mode.CONFERENCE,
           ),
         ),
       );
@@ -304,12 +299,6 @@ class _JoinScreenState extends State<JoinScreen> {
 
   @override
   void dispose() {
-    // SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.portraitUp,
-    //   DeviceOrientation.portraitDown,
-    //   DeviceOrientation.landscapeLeft,
-    //   DeviceOrientation.landscapeRight,
-    // ]);
     cameraTrack?.dispose();
     super.dispose();
   }

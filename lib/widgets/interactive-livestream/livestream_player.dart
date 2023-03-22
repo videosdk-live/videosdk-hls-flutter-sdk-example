@@ -13,6 +13,7 @@ class LivestreamPlayer extends StatefulWidget {
   final String downstreamUrl;
   final Orientation orientation;
   final bool showChat;
+  final bool showOverlay;
   final Function onChatButtonClicked;
   final Function onRaiseHandButtonClicked;
   final Function onPlaybackEnded;
@@ -21,6 +22,7 @@ class LivestreamPlayer extends StatefulWidget {
     required this.downstreamUrl,
     required this.orientation,
     required this.showChat,
+    required this.showOverlay,
     required this.onChatButtonClicked,
     required this.onRaiseHandButtonClicked,
     required this.onPlaybackEnded,
@@ -36,11 +38,8 @@ class LivestreamPlayerState extends State<LivestreamPlayer>
 
   //
   double sliderValue = 0.0;
-  double volumeValue = 50;
   String position = '';
   String duration = '';
-  int numberOfCaptions = 0;
-  int numberOfAudioTracks = 0;
   bool validPosition = false;
 
   bool isHandRaised = false;
@@ -51,7 +50,6 @@ class LivestreamPlayerState extends State<LivestreamPlayer>
   @override
   void initState() {
     super.initState();
-    log("VLC URL : ${widget.downstreamUrl}");
     _controller = VlcPlayerController.network(widget.downstreamUrl,
         options: VlcPlayerOptions());
     _controller.addListener(listener);
@@ -112,10 +110,11 @@ class LivestreamPlayerState extends State<LivestreamPlayer>
                 child: VlcPlayer(
                   controller: _controller,
                   aspectRatio: 16 / 9,
-                  placeholder: Center(child: CircularProgressIndicator()),
+                  placeholder: const Center(child: CircularProgressIndicator()),
                 ),
               ),
-              if (widget.orientation == Orientation.landscape)
+              if (widget.orientation == Orientation.landscape &&
+                  widget.showOverlay)
                 Positioned(
                     top: 4,
                     right: 6,
@@ -177,71 +176,72 @@ class LivestreamPlayerState extends State<LivestreamPlayer>
                         ),
                       ],
                     )),
-              SizedBox(
-                height: 40,
-                child: Row(
-                  children: [
-                    IconButton(
-                      color: Colors.white,
-                      icon: _controller.value.isPlaying
-                          ? Icon(Icons.pause)
-                          : Icon(Icons.play_arrow),
-                      onPressed: _togglePlaying,
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Text(
-                            position,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Expanded(
-                            child: Slider(
-                              activeColor: Colors.redAccent,
-                              inactiveColor: Colors.white70,
-                              value: sliderValue,
-                              min: 0.0,
-                              max: (!validPosition &&
-                                      _controller.value.duration == null)
-                                  ? 1.0
-                                  : _controller.value.duration.inSeconds
-                                      .toDouble(),
-                              onChanged: validPosition
-                                  ? _onSliderPositionChanged
-                                  : null,
-                            ),
-                          ),
-                          Text(
-                            duration,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+              if (widget.showOverlay)
+                SizedBox(
+                  height: 40,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        color: Colors.white,
+                        icon: _controller.value.isPlaying
+                            ? Icon(Icons.pause)
+                            : Icon(Icons.play_arrow),
+                        onPressed: _togglePlaying,
                       ),
-                    ),
-                    IconButton(
-                      icon: widget.orientation == Orientation.portrait
-                          ? Icon(Icons.fullscreen)
-                          : Icon(Icons.fullscreen_exit),
-                      color: Colors.white,
-                      onPressed: () {
-                        if (widget.orientation == Orientation.portrait) {
-                          SystemChrome.setPreferredOrientations([
-                            DeviceOrientation.landscapeLeft,
-                            DeviceOrientation.landscapeRight,
-                          ]);
-                        } else {
-                          SystemChrome.setPreferredOrientations([
-                            DeviceOrientation.portraitUp,
-                            DeviceOrientation.portraitDown,
-                          ]);
-                        }
-                      },
-                    ),
-                  ],
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              position,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            Expanded(
+                              child: Slider(
+                                activeColor: Colors.redAccent,
+                                inactiveColor: Colors.white70,
+                                value: sliderValue,
+                                min: 0.0,
+                                max: (!validPosition &&
+                                        _controller.value.duration == null)
+                                    ? 1.0
+                                    : _controller.value.duration.inSeconds
+                                        .toDouble(),
+                                onChanged: validPosition
+                                    ? _onSliderPositionChanged
+                                    : null,
+                              ),
+                            ),
+                            Text(
+                              duration,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: widget.orientation == Orientation.portrait
+                            ? Icon(Icons.fullscreen)
+                            : Icon(Icons.fullscreen_exit),
+                        color: Colors.white,
+                        onPressed: () {
+                          if (widget.orientation == Orientation.portrait) {
+                            SystemChrome.setPreferredOrientations([
+                              DeviceOrientation.landscapeLeft,
+                              DeviceOrientation.landscapeRight,
+                            ]);
+                          } else {
+                            SystemChrome.setPreferredOrientations([
+                              DeviceOrientation.portraitUp,
+                              DeviceOrientation.portraitDown,
+                            ]);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ),

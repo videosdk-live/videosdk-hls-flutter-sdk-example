@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/stats/call_stats.dart';
+import 'package:videosdk_hls_flutter_example/widgets/meeting/stats/call_stats.dart';
 
 class ParticipantGridTile extends StatefulWidget {
   final Participant participant;

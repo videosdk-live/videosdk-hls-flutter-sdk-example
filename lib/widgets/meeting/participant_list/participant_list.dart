@@ -5,7 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/participant/participant_list_item.dart';
+import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_list/participant_list_item.dart';
 
 class ParticipantList extends StatefulWidget {
   final Room meeting;
@@ -43,9 +43,7 @@ class _ParticipantListState extends State<ParticipantList> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
-                    "Participants (" +
-                        (widget.meeting.participants.length + 1).toString() +
-                        ")",
+                    "Participants (${widget.meeting.participants.length + 1})",
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 18),
                   ),

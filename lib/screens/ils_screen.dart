@@ -13,11 +13,11 @@ import 'package:videosdk_hls_flutter_example/widgets/common/joining/waiting_to_j
 import 'package:videosdk_hls_flutter_example/widgets/interactive-livestream/livestream_view.dart';
 import 'package:videosdk_hls_flutter_example/widgets/meeting/meeting_view.dart';
 
-class MeetingScreen extends StatefulWidget {
+class ILSScreen extends StatefulWidget {
   final String meetingId, token, displayName;
   final bool micEnabled, camEnabled, chatEnabled;
   final Mode mode;
-  const MeetingScreen({
+  const ILSScreen({
     Key? key,
     required this.meetingId,
     required this.token,
@@ -29,10 +29,10 @@ class MeetingScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MeetingScreen> createState() => _MeetingScreenState();
+  State<ILSScreen> createState() => _ILSScreenState();
 }
 
-class _MeetingScreenState extends State<MeetingScreen> {
+class _ILSScreenState extends State<ILSScreen> {
   // Meeting
   late Room meeting;
   bool _joined = false;

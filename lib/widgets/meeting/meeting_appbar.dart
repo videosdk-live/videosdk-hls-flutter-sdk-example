@@ -10,7 +10,7 @@ import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/hls_indicator.dart';
 import 'package:touch_ripple_effect/touch_ripple_effect.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/participant/participant_list.dart';
+import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_list/participant_list.dart';
 
 class MeetingAppBar extends StatefulWidget {
   final String token;

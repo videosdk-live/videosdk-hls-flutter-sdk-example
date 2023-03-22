@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/stats/call_stats_bottom_sheet.dart';
+import 'package:videosdk_hls_flutter_example/widgets/meeting/stats/call_stats_bottom_sheet.dart';
 
 class CallStats extends StatefulWidget {
   final Participant participant;

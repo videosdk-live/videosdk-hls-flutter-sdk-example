@@ -3,12 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
 import 'package:videosdk_hls_flutter_example/utils/toast.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/participant/participant_list.dart';
-import 'package:videosdk_hls_flutter_example/widgets/common/meeting_controls/meeting_action_bar.dart';
+import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_list/participant_list.dart';
+import 'package:videosdk_hls_flutter_example/widgets/meeting/meeting_action_bar.dart';
 import 'package:videosdk_hls_flutter_example/widgets/meeting/participant_grid.dart';
 import 'package:videosdk_hls_flutter_example/widgets/meeting/screenshare_view.dart';
 
-import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/meeting_appbar.dart';
+import 'package:videosdk_hls_flutter_example/widgets/meeting/meeting_appbar.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/chat/chat_view.dart';
 
 class MeetingView extends StatefulWidget {

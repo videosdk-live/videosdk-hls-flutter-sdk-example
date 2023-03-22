@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:touch_ripple_effect/touch_ripple_effect.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 
-import '../../../constants/colors.dart';
+import '../../constants/colors.dart';
 
 // Meeting ActionBar
 class MeetingActionBar extends StatelessWidget {

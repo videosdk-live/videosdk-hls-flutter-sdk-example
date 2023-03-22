@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/constants/colors.dart';
-import 'package:videosdk_hls_flutter_example/screens/join_screen.dart';
+import 'package:videosdk_hls_flutter_example/screens/speaker_join_screen.dart';
+import 'package:videosdk_hls_flutter_example/screens/viewer_join_screen.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -29,9 +30,8 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const JoinScreen(
-                                  isCreateMeeting: true,
-                                  mode: Mode.CONFERENCE)))
+                              builder: (context) => const SpeakerJoinScreen(
+                                  isCreateMeeting: true)))
                     }),
             const VerticalSpacer(32),
             Row(
@@ -63,9 +63,8 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const JoinScreen(
-                                  isCreateMeeting: false,
-                                  mode: Mode.CONFERENCE)))
+                              builder: (context) => const SpeakerJoinScreen(
+                                  isCreateMeeting: false)))
                     }),
             const VerticalSpacer(12),
             MaterialButton(
@@ -79,8 +78,7 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const JoinScreen(
-                                  isCreateMeeting: false, mode: Mode.VIEWER)))
+                              builder: (context) => const ViewerJoinScreen()))
                     }),
           ],
         ),

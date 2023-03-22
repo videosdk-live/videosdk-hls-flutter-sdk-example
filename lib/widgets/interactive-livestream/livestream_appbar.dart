@@ -1,37 +1,17 @@
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:videosdk/videosdk.dart';
 import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'package:videosdk_hls_flutter_example/widgets/common/app_bar/hls_indicator.dart';
 
-class LivestreamAppBar extends StatefulWidget {
-  final Room meeting;
+class LivestreamAppBar extends StatelessWidget {
   final String hlsState;
+  final int participantCount;
+  final Function onLeaveButtonPressed;
   const LivestreamAppBar(
-      {Key? key, required this.meeting, required this.hlsState})
+      {Key? key,
+      required this.participantCount,
+      required this.hlsState,
+      required this.onLeaveButtonPressed})
       : super(key: key);
-
-  @override
-  State<LivestreamAppBar> createState() => LivestreamAppBarState();
-}
-
-class LivestreamAppBarState extends State<LivestreamAppBar> {
-  int participants = 1;
-
-  @override
-  void initState() {
-    super.initState();
-    participants = widget.meeting.participants.length + 1;
-    registerMeetingEventListener(widget.meeting);
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -40,24 +20,24 @@ class LivestreamAppBarState extends State<LivestreamAppBar> {
         children: [
           IconButton(
               onPressed: () {
-                widget.meeting.leave();
+                onLeaveButtonPressed();
               },
               icon: const Icon(
                 Icons.close,
                 color: Colors.white,
               )),
-          if (widget.hlsState == "HLS_STARTING" ||
-              widget.hlsState == "HLS_STOPPING" ||
-              widget.hlsState == "HLS_STARTED")
+          if (hlsState == "HLS_STARTING" ||
+              hlsState == "HLS_STOPPING" ||
+              hlsState == "HLS_STARTED")
             HLSIndicator(
-              hlsState: widget.hlsState,
+              hlsState: hlsState,
               isButton: false,
             ),
-          if (widget.hlsState == "HLS_STARTING" ||
-              widget.hlsState == "HLS_STOPPING" ||
-              widget.hlsState == "HLS_STARTED")
+          if (hlsState == "HLS_STARTING" ||
+              hlsState == "HLS_STOPPING" ||
+              hlsState == "HLS_STARTED")
             const HorizontalSpacer(),
-          if (widget.hlsState == "HLS_STARTED")
+          if (hlsState == "HLS_STARTED")
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
@@ -71,25 +51,12 @@ class LivestreamAppBarState extends State<LivestreamAppBar> {
                     size: 16,
                   ),
                   const HorizontalSpacer(6),
-                  Text(participants.toString()),
+                  Text(participantCount.toString()),
                 ],
               ),
             )
         ],
       ),
     );
-  }
-
-  void registerMeetingEventListener(Room meeting) {
-    meeting.on(Events.participantJoined, (participant) {
-      setState(() {
-        participants = meeting.participants.length + 1;
-      });
-    });
-    meeting.on(Events.participantLeft, (participant) {
-      setState(() {
-        participants = meeting.participants.length + 1;
-      });
-    });
   }
 }
