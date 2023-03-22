@@ -442,15 +442,12 @@ speaker
 - [`speaker_view.dart`](/lib/widgets/speaker/speaker_view.dart) is responsible to show all the speaker controls like camera, mic, screenshare controls along with options to go live and add viewer as co-host.
 
 <p align="center">
-  <img width="300" src="assets/Tabs.png"/>
+  <img height="480" src="gifs/speaker.jpg"/>
 </p>
 
 **2. Participants**
 
 - [`participant_list.dart`](/lib//widgets/speaker/participant_list/participant_list.dart) and [`participant_list_item.dart`](/lib/widgets/speaker/participant_list/participant_list_item.dart) are responsible to show the participants list, from where a speaker can invite the viewer to the co-host.
-  <p align="center">
-  <img width="300" src="assets/participants.gif"/>
-  </p>
 
 - **_Add as a co-Host_**
 
@@ -480,8 +477,10 @@ viewer
 
 - [`viewer_view.dart`](lib/widgets/viewer/viewer_view.dart) is responsible to show the view the livestream and also them to interact with chat.
 
+- [`livestream_player.dart`](lib/widgets/viewer/livestream_player.dart) is responsible to to play the HLS video for which we are using the `flutter_vlc_player` library.
+
 <p align="center">
-  <img width="300" src="assets/viewer.gif"/>
+  <img height="480" src="gifs/viewer.png"/>
   </p>
 
 ## Examples

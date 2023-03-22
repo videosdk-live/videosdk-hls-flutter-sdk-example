@@ -17,15 +17,13 @@ class _HLSIndicatorState extends State<HLSIndicator>
 
   @override
   void initState() {
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _animationController = AnimationController(
+        vsync: this,
+        value: widget.hlsState == "HLS_STARTED" ? 1 : 0,
+        duration: Duration(seconds: 1));
     if (widget.hlsState == "HLS_STARTING" ||
         widget.hlsState == "HLS_STOPPING") {
-      _animationController.duration = const Duration(seconds: 1);
       _animationController.repeat(reverse: true);
-    } else {
-      _animationController.duration = const Duration(seconds: 0);
-      _animationController.forward();
     }
     super.initState();
   }
