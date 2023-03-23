@@ -4,8 +4,7 @@
 
 ---
 
-[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.videosdk.live/android/guide/video-and-audio-calling-api-sdk/getting-started)
-[![Firebase](https://img.shields.io/badge/Download%20Android-Firebase-green)](https://appdistribution.firebase.dev/i/99ae2c5db3a7e446)
+[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.videosdk.live/flutter/guide/video-and-audio-calling-api-sdk/getting-started)
 [![Discord](https://img.shields.io/discord/876774498798551130?label=Join%20on%20Discord)](https://discord.gg/bGZtAbwvab)
 [![Register](https://img.shields.io/badge/Contact-Know%20More-blue)](https://app.videosdk.live/signup)
 
@@ -221,8 +220,6 @@ room.leave();
 room.end();
 ```
 
-<br/>
-
 ## [Change Mode]()
 
 - If you want to change the mode of a participant, use the meeting's `changeMode()` method.
@@ -295,8 +292,6 @@ room.unmuteMic();
 room.muteMic();
 ```
 
-<br/>
-
 ## [Change Audio Device](https://docs.videosdk.live/flutter/guide/video-and-audio-calling-api-sdk/features/switch-audio-output)
 
 - The `meeting.getAudioOutputDevices()` function allows a participant to list all of the attached audio devices (e.g., Bluetooth and Earphone).
@@ -315,7 +310,6 @@ room.switchAudioOutput(mediaDeviceInfo);
 
 - Please consult our documentation [Change Audio Device](https://docs.videosdk.live/flutter/guide/video-and-audio-calling-api-sdk/features/switch-audio-output) for more infromation.
 
-<br/>
 ## [Enable/Disable Local Webcam](https://docs.videosdk.live/flutter/guide/video-and-audio-calling-api-sdk/features/camera-controls)
 
 ```js
@@ -326,16 +320,12 @@ room.enableCam();
 room.disableCam();
 ```
 
-<br/>
-
 ## [Switch Local Webcam](https://docs.videosdk.live/flutter/guide/video-and-audio-calling-api-sdk/features/camera-controls)
 
 ```js
 // switch webcam
 room.changeCam(deviceId);
 ```
-
-<br/>
 
 ## [Start/Stop HLS]()
 
