@@ -17,7 +17,7 @@ At Video SDK, we’re building tools to help companies create world-class collab
 - Interactive live stream (HLS) allows you to distribute content and ensure excellent viewing experiences across devices, playback platforms, and network conditions. It is the ideal protocol for streaming video to large audiences scattered across geographies.
 
 <p align="center">
-<img src="assets/HLS.png"/>
+<img src="gifs/hls.png"/>
 </p>
 
 - VideoSDK also allows you to configure the interactive livestream layouts in numerous ways like by simply setting different prebuilt layouts in the configuration or by providing your own [custom template](https://docs.videosdk.live/docs/tutorials/customized-layout) to do the livestream according to your layout choice.
