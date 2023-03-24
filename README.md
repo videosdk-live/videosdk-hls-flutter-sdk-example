@@ -204,7 +204,7 @@ Token is used to create and validate a meeting using API and also initialise a m
       );
 ```
 
-## [Join Meeting](https://docs.videosdk.live/android/guide/video-and-audio-calling-api-sdk/features/start-join-meeting)
+## [Join Meeting](https://docs.videosdk.live/flutter/guide/video-and-audio-calling-api-sdk/features/start-join-meeting)
 
 ```js
 room.join();
@@ -408,7 +408,7 @@ screens
    <img height="480" src="gifs/viewer_join.gif"/>
    </p>
 
-### [speaker package](app/src/main/java/live/videosdk/android/hlsdemo/speakerMode)
+### [speaker package](lib/widgets/speaker)
 
 ```
 speaker
@@ -441,7 +441,7 @@ speaker
 
 - **_Add as a co-Host_**
 
-  - Here, we are using `pubSub` to request a viewer to be co-host. [Click here](https://docs.videosdk.live/android/guide/video-and-audio-calling-api-sdk/features/pubsub) to know more about `pubSub`.
+  - Here, we are using `pubSub` to request a viewer to be co-host. [Click here](https://docs.videosdk.live/flutter/guide/video-and-audio-calling-api-sdk/features/pubsub) to know more about `pubSub`.
    <p align="center">
      <b>Host   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Viewer </b>
   </p>
