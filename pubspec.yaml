@@ -9,8 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  videosdk:
-    path: ../../zn_flutter_sdk
+  videosdk: ^1.0.12
   http: ^0.13.5
   flutter_dotenv: ^5.0.2
   flutter_svg: ^2.0.2

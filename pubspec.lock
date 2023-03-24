@@ -560,10 +560,11 @@ packages:
   videosdk:
     dependency: "direct main"
     description:
-      path: "../../zn_flutter_sdk"
-      relative: true
-    source: path
-    version: "1.0.11"
+      name: videosdk
+      sha256: "6129165e31cd8cb8c53eaa89d9f8b00d302015b3dba7363746a8ca9f435e099a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.12"
   videosdk_room_stats:
     dependency: transitive
     description:
