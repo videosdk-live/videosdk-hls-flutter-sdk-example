@@ -18,7 +18,8 @@ class ViewerJoinScreen extends StatefulWidget {
 
 class _ViewerJoinScreenState extends State<ViewerJoinScreen> {
   String _token = "";
-  TextEditingController meetingIdTextController = TextEditingController();
+  TextEditingController meetingIdTextController =
+      TextEditingController(text: "s87z-lvsj-riwb");
   TextEditingController nameTextController = TextEditingController();
   @override
   void initState() {

@@ -40,7 +40,7 @@ class _ViewerViewState extends State<ViewerView> {
     // Register meeting events
     hlsState = widget.meeting.hlsState;
     if (widget.meeting.hlsDownstreamUrl != null) {
-      updateDownstreamUrl(widget.meeting.hlsDownstreamUrl!);
+      downstreamUrl = widget.meeting.hlsDownstreamUrl;
     }
     participants = widget.meeting.participants.length + 1;
 
@@ -73,7 +73,7 @@ class _ViewerViewState extends State<ViewerView> {
             children: [
               if (orientation == Orientation.portrait) const VerticalSpacer(40),
               if (downstreamUrl != null &&
-                  (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING") &&
+                  (hlsState == "HLS_PLAYABLE" || hlsState == "HLS_STOPPING") &&
                   !isEnded)
                 Expanded(
                   flex: orientation == Orientation.landscape ? 2 : 1,
@@ -108,7 +108,7 @@ class _ViewerViewState extends State<ViewerView> {
                   ),
                 ),
               if (downstreamUrl != null &&
-                  (hlsState == "HLS_STARTED" || hlsState == "HLS_STOPPING") &&
+                  (hlsState == "HLS_PLAYABLE" || hlsState == "HLS_STOPPING") &&
                   (showChat || orientation == Orientation.portrait) &&
                   !isEnded)
                 Expanded(
@@ -186,9 +186,13 @@ class _ViewerViewState extends State<ViewerView> {
       setState(() {
         hlsState = data['status'];
       });
-      if (data['status'] == "HLS_STARTED") {
-        Timer(const Duration(seconds: 10),
-            () => {updateDownstreamUrl(data['downstreamUrl'])});
+      if (data['status'] == "HLS_PLAYABLE") {
+        setState(() {
+          downstreamUrl = data['downstreamUrl'];
+          isEnded = false;
+          showOverlay = true;
+          hideOverlay();
+        });
       } else if (data['status'] == "HLS_STOPPED") {
         setState(() {
           downstreamUrl = null;
@@ -226,21 +230,6 @@ class _ViewerViewState extends State<ViewerView> {
       return true;
     }
     return false;
-  }
-
-  void updateDownstreamUrl(String url) {
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
-      bool isPlayable = await isHlsPlayable(url);
-      if (isPlayable) {
-        setState(() {
-          downstreamUrl = url;
-          isEnded = false;
-          showOverlay = true;
-          hideOverlay();
-        });
-        timer.cancel();
-      }
-    });
   }
 
   void hideOverlay() {

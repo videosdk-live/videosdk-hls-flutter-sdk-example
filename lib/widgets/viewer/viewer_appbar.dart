@@ -28,6 +28,7 @@ class ViewerAppBar extends StatelessWidget {
               )),
           if (hlsState == "HLS_STARTING" ||
               hlsState == "HLS_STOPPING" ||
+              hlsState == "HLS_PLAYABLE" ||
               hlsState == "HLS_STARTED")
             HLSIndicator(
               hlsState: hlsState,
@@ -35,6 +36,7 @@ class ViewerAppBar extends StatelessWidget {
             ),
           if (hlsState == "HLS_STARTING" ||
               hlsState == "HLS_STOPPING" ||
+              hlsState == "HLS_PLAYABLE" ||
               hlsState == "HLS_STARTED")
             const HorizontalSpacer(),
           if (hlsState == "HLS_STARTED")
