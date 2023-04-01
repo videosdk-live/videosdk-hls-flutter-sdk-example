@@ -215,7 +215,7 @@ class SpeakerAppBarState extends State<SpeakerAppBar> {
       if (mounted) {
         showSnackBarMessage(
             message:
-                "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : data['status'] == "HLS_STARTED" ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
+                "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : (data['status'] == "HLS_STARTED" || data['status'] == "HLS_PLAYABLE") ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
             context: context);
       }
       setState(() {
