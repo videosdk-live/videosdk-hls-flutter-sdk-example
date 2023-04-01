@@ -28,8 +28,7 @@ class _SpeakerJoinScreenState extends State<SpeakerJoinScreen> {
   CustomTrack? cameraTrack;
   RTCVideoRenderer? cameraRenderer;
 
-  TextEditingController meetingIdTextController =
-      TextEditingController(text: "s87z-lvsj-riwb");
+  TextEditingController meetingIdTextController = TextEditingController();
   TextEditingController nameTextController = TextEditingController();
   @override
   void initState() {
