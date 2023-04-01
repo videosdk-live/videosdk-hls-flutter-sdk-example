@@ -128,36 +128,37 @@ class _ViewerJoinScreenState extends State<ViewerJoinScreen> {
           message: "Please enter Valid Meeting ID", context: context);
       return;
     }
-    String _meetingId = meetingIdTextController.text;
-    String _name = nameTextController.text;
-    var validMeeting = await validateMeeting(_token, _meetingId);
-    if (validMeeting) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ILSScreen(
-            token: _token,
-            meetingId: _meetingId,
-            displayName: _name,
-            micEnabled: false,
-            camEnabled: false,
-            mode: Mode.VIEWER,
+
+    if (nameTextController.text.isEmpty) {
+      showSnackBarMessage(message: "Please enter Name", context: context);
+      return;
+    }
+    String meetingId = meetingIdTextController.text;
+    String name = nameTextController.text;
+    var validMeeting = await validateMeeting(_token, meetingId);
+    if (context.mounted) {
+      if (validMeeting) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ILSScreen(
+              token: _token,
+              meetingId: meetingId,
+              displayName: name,
+              micEnabled: false,
+              camEnabled: false,
+              mode: Mode.VIEWER,
+            ),
           ),
-        ),
-      );
-    } else {
-      showSnackBarMessage(message: "Invalid Meeting ID", context: context);
+        );
+      } else {
+        showSnackBarMessage(message: "Invalid Meeting ID", context: context);
+      }
     }
   }
 
   @override
   void dispose() {
-    // SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.portraitUp,
-    //   DeviceOrientation.portraitDown,
-    //   DeviceOrientation.landscapeLeft,
-    //   DeviceOrientation.landscapeRight,
-    // ]);
     super.dispose();
   }
 }
