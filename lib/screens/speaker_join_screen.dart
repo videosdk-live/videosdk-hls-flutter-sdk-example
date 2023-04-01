@@ -272,26 +272,32 @@ class _SpeakerJoinScreenState extends State<SpeakerJoinScreen> {
           message: "Please enter Valid Meeting ID", context: context);
       return;
     }
-    String _meetingId = meetingIdTextController.text;
-    String _name = nameTextController.text;
-    var validMeeting = await validateMeeting(_token, _meetingId);
-    if (validMeeting) {
-      disposeCameraPreview();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ILSScreen(
-            token: _token,
-            meetingId: _meetingId,
-            displayName: _name,
-            micEnabled: isMicOn,
-            camEnabled: isCameraOn,
-            mode: Mode.CONFERENCE,
+    if (nameTextController.text.isEmpty) {
+      showSnackBarMessage(message: "Please enter Name", context: context);
+      return;
+    }
+    String meetingId = meetingIdTextController.text;
+    String name = nameTextController.text;
+    var validMeeting = await validateMeeting(_token, meetingId);
+    if (context.mounted) {
+      if (validMeeting) {
+        disposeCameraPreview();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ILSScreen(
+              token: _token,
+              meetingId: meetingId,
+              displayName: name,
+              micEnabled: isMicOn,
+              camEnabled: isCameraOn,
+              mode: Mode.CONFERENCE,
+            ),
           ),
-        ),
-      );
-    } else {
-      showSnackBarMessage(message: "Invalid Meeting ID", context: context);
+        );
+      } else {
+        showSnackBarMessage(message: "Invalid Meeting ID", context: context);
+      }
     }
   }
 

@@ -122,7 +122,8 @@ class SpeakerAppBarState extends State<SpeakerAppBar> {
                       showSnackBarMessage(
                           message: "HLS is in stopping state",
                           context: context);
-                    } else if (hlsState == "HLS_STARTED") {
+                    } else if (hlsState == "HLS_STARTED" ||
+                        hlsState == "HLS_PLAYABLE") {
                       widget.meeting.stopHls();
                     } else if (hlsState == "HLS_STARTING") {
                       showSnackBarMessage(

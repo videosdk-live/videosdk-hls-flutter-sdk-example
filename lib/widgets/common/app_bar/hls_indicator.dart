@@ -19,7 +19,10 @@ class _HLSIndicatorState extends State<HLSIndicator>
   void initState() {
     _animationController = AnimationController(
         vsync: this,
-        value: widget.hlsState == "HLS_STARTED" ? 1 : 0,
+        value: widget.hlsState == "HLS_STARTED" ||
+                widget.hlsState == "HLS_PLAYABLE"
+            ? 1
+            : 0,
         duration: Duration(seconds: 1));
     if (widget.hlsState == "HLS_STARTING" ||
         widget.hlsState == "HLS_STOPPING") {
@@ -30,7 +33,9 @@ class _HLSIndicatorState extends State<HLSIndicator>
 
   @override
   void didUpdateWidget(covariant HLSIndicator oldWidget) {
-    if (widget.hlsState == "HLS_STARTED" || widget.hlsState == "HLS_STOPPED") {
+    if (widget.hlsState == "HLS_STARTED" ||
+        widget.hlsState == "HLS_PLAYABLE" ||
+        widget.hlsState == "HLS_STOPPED") {
       _animationController.stop();
       _animationController.forward();
     } else {
@@ -57,7 +62,8 @@ class _HLSIndicatorState extends State<HLSIndicator>
                       ? "Go Live"
                       : widget.hlsState == "HLS_STARTING"
                           ? "Starting Live"
-                          : widget.hlsState == "HLS_STARTED"
+                          : widget.hlsState == "HLS_STARTED" ||
+                                  widget.hlsState == "HLS_PLAYABLE"
                               ? "Stop Live"
                               : "Stopping Live",
                   style: const TextStyle(fontWeight: FontWeight.w500),
