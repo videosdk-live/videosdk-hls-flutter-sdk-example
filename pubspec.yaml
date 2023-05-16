@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   videosdk: ^1.0.13
-  http: ^0.13.5
+  http: ^0.13.6
   flutter_dotenv: ^5.0.2
   flutter_svg: ^2.0.2
   touch_ripple_effect: ^2.2.3
