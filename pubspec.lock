@@ -561,18 +561,18 @@ packages:
     dependency: "direct main"
     description:
       name: videosdk
-      sha256: e5672f859c54485150ce122658a4e8cc8e16943ba2167f3ef00a52c7e25d542c
+      sha256: "402950f50a31b442cc49857d5e523125b8dbf55e1872a554c6dd543c7b62d1a0"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.13"
+    version: "1.1.3"
   videosdk_room_stats:
     dependency: transitive
     description:
       name: videosdk_room_stats
-      sha256: "1c0be63a3608b11690a925eebba09aa61a18ba3671609db5a7af9bffd742d2fb"
+      sha256: "81d2efdccd719dc24b4376ec0b6310e3b55fea3829026e4c14b293e2931aa633"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1"
+    version: "0.0.3"
   webrtc_interface:
     dependency: transitive
     description:
