@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
   videosdk: ^1.0.13
   http: ^0.13.5
-  flutter_dotenv: ^5.0.2
+  flutter_dotenv: ^5.1.0
   flutter_svg: ^2.0.2
   touch_ripple_effect: ^2.2.3
   flutter_vlc_player: ^7.2.0
