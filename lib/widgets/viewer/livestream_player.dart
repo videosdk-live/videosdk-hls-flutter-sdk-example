@@ -10,7 +10,7 @@ import 'package:videosdk_hls_flutter_example/utils/spacer.dart';
 import 'package:touch_ripple_effect/touch_ripple_effect.dart';
 
 class LivestreamPlayer extends StatefulWidget {
-  final String downstreamUrl;
+  final String playbackHlsUrl;
   final Orientation orientation;
   final bool showChat;
   final bool showOverlay;
@@ -19,7 +19,7 @@ class LivestreamPlayer extends StatefulWidget {
   final Function onPlaybackEnded;
   const LivestreamPlayer({
     Key? key,
-    required this.downstreamUrl,
+    required this.playbackHlsUrl,
     required this.orientation,
     required this.showChat,
     required this.showOverlay,
@@ -50,7 +50,7 @@ class LivestreamPlayerState extends State<LivestreamPlayer>
   @override
   void initState() {
     super.initState();
-    _controller = VlcPlayerController.network(widget.downstreamUrl,
+    _controller = VlcPlayerController.network(widget.playbackHlsUrl,
         options: VlcPlayerOptions());
     _controller.addListener(listener);
   }

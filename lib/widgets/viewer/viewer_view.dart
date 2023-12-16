@@ -28,7 +28,7 @@ class _ViewerViewState extends State<ViewerView> {
   bool showChatSnackbar = true;
 
   late String hlsState;
-  String? downstreamUrl;
+  String? playbackHlsUrl;
   bool showChat = true;
   bool isEnded = false;
   bool showOverlay = true;
@@ -39,8 +39,8 @@ class _ViewerViewState extends State<ViewerView> {
     super.initState();
     // Register meeting events
     hlsState = widget.meeting.hlsState;
-    if (widget.meeting.hlsDownstreamUrl != null) {
-      downstreamUrl = widget.meeting.hlsDownstreamUrl;
+    if (widget.meeting.hlsPlaybackHlsUrl != null) {
+      playbackHlsUrl = widget.meeting.hlsPlaybackHlsUrl;
     }
     participants = widget.meeting.participants.length + 1;
 
@@ -61,7 +61,7 @@ class _ViewerViewState extends State<ViewerView> {
     return OrientationBuilder(builder: (context, orientation) {
       return Stack(
         children: [
-          if (downstreamUrl == null ||
+          if (playbackHlsUrl == null ||
               hlsState == "HLS_STARTING" ||
               hlsState == "HLS_STOPPED" ||
               isEnded)
@@ -72,7 +72,7 @@ class _ViewerViewState extends State<ViewerView> {
                 : Axis.horizontal,
             children: [
               if (orientation == Orientation.portrait) const VerticalSpacer(40),
-              if (downstreamUrl != null &&
+              if (playbackHlsUrl != null &&
                   (hlsState == "HLS_PLAYABLE" || hlsState == "HLS_STOPPING") &&
                   !isEnded)
                 Expanded(
@@ -87,7 +87,7 @@ class _ViewerViewState extends State<ViewerView> {
                       }
                     },
                     child: LivestreamPlayer(
-                      downstreamUrl: downstreamUrl!,
+                      playbackHlsUrl: playbackHlsUrl!,
                       orientation: orientation,
                       showChat: showChat,
                       showOverlay: showOverlay,
@@ -107,7 +107,7 @@ class _ViewerViewState extends State<ViewerView> {
                     ),
                   ),
                 ),
-              if (downstreamUrl != null &&
+              if (playbackHlsUrl != null &&
                   (hlsState == "HLS_PLAYABLE" || hlsState == "HLS_STOPPING") &&
                   (showChat || orientation == Orientation.portrait) &&
                   !isEnded)
@@ -188,14 +188,14 @@ class _ViewerViewState extends State<ViewerView> {
       });
       if (data['status'] == "HLS_PLAYABLE") {
         setState(() {
-          downstreamUrl = data['downstreamUrl'];
+          playbackHlsUrl = data['playbackHlsUrl'];
           isEnded = false;
           showOverlay = true;
           hideOverlay();
         });
       } else if (data['status'] == "HLS_STOPPED") {
         setState(() {
-          downstreamUrl = null;
+          playbackHlsUrl = null;
         });
       }
     });
