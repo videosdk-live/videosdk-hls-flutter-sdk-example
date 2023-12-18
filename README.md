@@ -253,7 +253,7 @@ By registering callback handlers, VideoSDK sends callbacks to the client app whe
 
     room.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
       // This event will be emitted whenever meeting HLS state changes.
-      // [data] : { state: String, playbackHlsUrl: String }
+      // [data] : { state: String, playbackHlsUrl: String, livestreamUrl:String }
 
     });
 
