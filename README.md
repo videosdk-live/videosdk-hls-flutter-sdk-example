@@ -253,7 +253,7 @@ By registering callback handlers, VideoSDK sends callbacks to the client app whe
 
     room.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
       // This event will be emitted whenever meeting HLS state changes.
-      // [data] : { state: String, downstreamUrl: String }
+      // [data] : { state: String, playbackHlsUrl: String, livestreamUrl:String }
 
     });
 
@@ -481,7 +481,8 @@ viewer
 
 <br/>
 
-## Examples 
+## Examples
+
 ### Examples for Conference
 
 - [videosdk-rtc-prebuilt-examples](https://github.com/videosdk-live/videosdk-rtc-prebuilt-examples)
@@ -502,7 +503,6 @@ viewer
 - [videosdk-hls-android-kotlin-example](https://github.com/videosdk-live/videosdk-hls-android-kotlin-example)
 
 <br/>
-
 
 ## Documentation
 
