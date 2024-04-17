@@ -113,10 +113,10 @@ class _SpeakerJoinScreenState extends State<SpeakerJoinScreen> {
                               child: Icon(isMicOn ? Icons.mic : Icons.mic_off,
                                   color: isMicOn ? grey : Colors.white),
                               style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.black,
+                                backgroundColor: isMicOn ? Colors.white : red,
                                 shape: const CircleBorder(),
                                 padding: const EdgeInsets.all(12),
-                                primary: isMicOn ? Colors.white : red,
-                                onPrimary: Colors.black,
                               ),
                             ),
                             ElevatedButton(
@@ -130,8 +130,9 @@ class _SpeakerJoinScreenState extends State<SpeakerJoinScreen> {
                               },
                               style: ElevatedButton.styleFrom(
                                 shape: const CircleBorder(),
+                                backgroundColor:
+                                    isCameraOn ? Colors.white : red,
                                 padding: const EdgeInsets.all(12),
-                                primary: isCameraOn ? Colors.white : red,
                               ),
                               child: Icon(
                                 isCameraOn
