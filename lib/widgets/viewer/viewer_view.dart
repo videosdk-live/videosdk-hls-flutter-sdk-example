@@ -39,8 +39,8 @@ class _ViewerViewState extends State<ViewerView> {
     super.initState();
     // Register meeting events
     hlsState = widget.meeting.hlsState;
-    if (widget.meeting.hlsPlaybackHlsUrl != null) {
-      playbackHlsUrl = widget.meeting.hlsPlaybackHlsUrl;
+    if (widget.meeting.hlsUrls != null) {
+      playbackHlsUrl = widget.meeting.hlsUrls['playbackHlsUrl'];
     }
     participants = widget.meeting.participants.length + 1;
 
