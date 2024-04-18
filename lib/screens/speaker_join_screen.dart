@@ -22,7 +22,7 @@ class _SpeakerJoinScreenState extends State<SpeakerJoinScreen> {
   String _token = "";
 
   // Control Status
-  bool isMicOn = false;
+  bool isMicOn = true;
   bool isCameraOn = true;
 
   CustomTrack? cameraTrack;

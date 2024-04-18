@@ -42,7 +42,6 @@ class _ViewerViewState extends State<ViewerView> {
     if (widget.meeting.hlsUrls != null) {
       playbackHlsUrl = widget.meeting.hlsUrls['playbackHlsUrl'];
     }
-    print("playbackUrl ${widget.meeting.hlsUrls}");
     participants = widget.meeting.participants.length + 1;
 
     registerMeetingEvents(widget.meeting);
