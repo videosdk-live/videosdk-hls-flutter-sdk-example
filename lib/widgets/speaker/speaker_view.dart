@@ -117,9 +117,9 @@ class _SpeakerViewState extends State<SpeakerView> {
               },
 
               onSwitchMicButtonPressed: (details) async {
-                List<MediaDeviceInfo> outptuDevice =
-                    widget.meeting.getAudioOutputDevices();
-                double bottomMargin = (70.0 * outptuDevice.length);
+                List<AudioDeviceInfo>? outptuDevice =
+                    await VideoSDK.getAudioDevices();
+                double bottomMargin = (70.0 * outptuDevice!.length);
                 final screenSize = MediaQuery.of(context).size;
                 await showMenu(
                   context: context,
@@ -144,9 +144,9 @@ class _SpeakerViewState extends State<SpeakerView> {
               },
 
               onSwitchCameraButtonPressed: (details) async {
-                List<MediaDeviceInfo> outptuDevice =
-                    widget.meeting.getCameras();
-                double bottomMargin = (70.0 * outptuDevice.length);
+                List<VideoDeviceInfo>? outptuDevice =
+                    await VideoSDK.getVideoDevices();
+                double bottomMargin = (70.0 * outptuDevice!.length);
                 final screenSize = MediaQuery.of(context).size;
                 await showMenu(
                   context: context,
@@ -165,7 +165,7 @@ class _SpeakerViewState extends State<SpeakerView> {
                   elevation: 8.0,
                 ).then((value) {
                   if (value != null) {
-                    widget.meeting.changeCam(value.deviceId);
+                    widget.meeting.changeCam(value);
                   }
                 });
               },

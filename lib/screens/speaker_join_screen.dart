@@ -249,10 +249,10 @@ class _SpeakerJoinScreenState extends State<SpeakerJoinScreen> {
   }
 
   void initCameraPreview() async {
-    CustomTrack track = await VideoSDK.createCameraVideoTrack();
+    CustomTrack? track = await VideoSDK.createCameraVideoTrack();
     RTCVideoRenderer render = RTCVideoRenderer();
     await render.initialize();
-    render.setSrcObject(stream: track.mediaStream);
+    render.setSrcObject(stream: track?.mediaStream);
     setState(() {
       cameraTrack = track;
       cameraRenderer = render;
