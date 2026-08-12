@@ -40,6 +40,7 @@ class _SpeakerJoinScreenState extends State<SpeakerJoinScreen> {
         _token = token;
       });
       if (widget.isCreateMeeting) {
+      VideoSDK.setLogLevel(LogLevel.all);
         final meetingId = await createMeeting(token);
         setState(() {
           meetingIdTextController.value = TextEditingValue(text: meetingId);
