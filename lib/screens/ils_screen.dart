@@ -49,6 +49,7 @@ class _ILSScreenState extends State<ILSScreen> {
     // Create instance of Room (Meeting)
     Room room = VideoSDK.createRoom(
       roomId: widget.meetingId,
+      // roomId:'oema-eybm-h67l',
       token: widget.token,
       displayName: widget.displayName,
       micEnabled: widget.micEnabled,
@@ -121,10 +122,11 @@ class _ILSScreenState extends State<ILSScreen> {
     });
 
     // Called when meeting is ended
-    _meeting.on(Events.roomLeft, (String? errorMsg) {
-      if (errorMsg != null) {
+    _meeting.on(Events.roomLeft, (LeaveReason? reason) {
+      if (reason != null) {
         showSnackBarMessage(
-            message: "Meeting left due to $errorMsg !!", context: context);
+            message: "Meeting left due to ${reason.message} !!",
+            context: context);
       }
       Navigator.pushAndRemoveUntil(
           context,

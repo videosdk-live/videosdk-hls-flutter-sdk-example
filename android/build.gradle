@@ -1,16 +1,3 @@
-buildscript {
-    ext.kotlin_version = '1.7.10'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 allprojects {
     repositories {
         google()
@@ -26,6 +13,28 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+// Some plugins (e.g. videosdk) hardcode an older compileSdkVersion than
+// their own dependencies (e.g. device_info_plus) now require. Force every
+// Android library module to compile against the same SDK level as the app
+// to avoid AAR metadata mismatches. This only affects which compile-time
+// API stubs are visible, not runtime behavior.
+subprojects { proj ->
+    def alignCompileSdk = {
+        if (proj.plugins.hasPlugin('com.android.library') || proj.plugins.hasPlugin('com.android.application')) {
+            def targetCompileSdk = 36
+            def current = proj.android.compileSdkVersion?.toString()?.replaceAll('[^0-9]', '')?.toInteger() ?: 0
+            if (current < targetCompileSdk) {
+                proj.android.compileSdkVersion targetCompileSdk
+            }
+        }
+    }
+    if (proj.state.executed) {
+        alignCompileSdk()
+    } else {
+        proj.afterEvaluate { alignCompileSdk() }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.layout.buildDirectory
 }
