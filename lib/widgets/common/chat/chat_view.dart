@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -41,7 +42,8 @@ class _ChatViewState extends State<ChatView> {
     // Subscribing 'CHAT' Topic
     widget.meeting.pubSub
         .subscribe("CHAT", messageHandler)
-        .then((value) => setState((() => messages = value)));
+        .then((value) => setState((() => messages = value)))
+        .catchError((Object e) => log("Subscribe failed: $e"));
   }
 
   @override
@@ -156,7 +158,9 @@ class _ChatViewState extends State<ChatView> {
                                             persist: true),
                                       )
                                       .then(
-                                          (value) => msgTextController.clear()),
+                                          (value) => msgTextController.clear())
+                                      .catchError((Object e) =>
+                                          log("Publish failed: $e")),
                               child: Container(
                                   padding: const EdgeInsets.all(8),
                                   width: 45,
@@ -182,7 +186,9 @@ class _ChatViewState extends State<ChatView> {
                         onTap: () {
                           if (!isRaisedHand) {
                             widget.meeting.pubSub
-                                .publish("RAISE_HAND", "message");
+                                .publish("RAISE_HAND", "message")
+                                .catchError((Object e) =>
+                                    log("Publish failed: $e"));
                             setState(() {
                               isRaisedHand = true;
                             });
@@ -226,7 +232,9 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   void dispose() {
-    widget.meeting.pubSub.unsubscribe("CHAT", messageHandler);
+    widget.meeting.pubSub
+        .unsubscribe("CHAT", messageHandler)
+        .catchError((Object e) => log("Unsubscribe failed: $e"));
     super.dispose();
   }
 }
