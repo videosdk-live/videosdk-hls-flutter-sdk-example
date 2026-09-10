@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.videosdk_hls_flutter_example"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 37
     ndkVersion flutter.ndkVersion
 
     compileOptions {

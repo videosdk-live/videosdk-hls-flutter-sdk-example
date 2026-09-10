@@ -81,7 +81,8 @@ class _ParticipantListState extends State<ParticipantList> {
                                         Mode.CONFERENCE
                                     ? Mode.VIEWER.name
                                     : Mode.CONFERENCE.name
-                          }));
+                          }))
+                          .catchError((Object e) => log("Publish failed: $e"));
                     } else if (value == "Remove Participant") {
                       log("Selected remove participnt");
 
@@ -137,6 +138,9 @@ class _ParticipantListState extends State<ParticipantList> {
           participants.remove(message.senderId);
         });
       });
+    }).catchError((Object e) {
+      log("Subscribe failed: $e");
+      return PubSubMessages(messages: const []);
     });
   }
 }

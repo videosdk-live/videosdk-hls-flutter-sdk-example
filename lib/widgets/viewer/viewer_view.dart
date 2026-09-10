@@ -97,7 +97,8 @@ class _ViewerViewState extends State<ViewerView> {
                         });
                       },
                       onRaiseHandButtonClicked: () {
-                        widget.meeting.pubSub.publish("RAISE_HAND", "message");
+                        widget.meeting.pubSub.publish("RAISE_HAND", "message")
+                            .catchError((Object e) => log("Publish failed: $e"));
                       },
                       onPlaybackEnded: () {
                         setState(() {
@@ -221,6 +222,9 @@ class _ViewerViewState extends State<ViewerView> {
           }
         }
       }
+    }).catchError((Object e) {
+      log("Subscribe failed: $e");
+      return PubSubMessages(messages: const []);
     });
   }
 

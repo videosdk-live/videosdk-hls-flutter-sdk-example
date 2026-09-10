@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:videosdk/videosdk.dart';
@@ -189,6 +190,9 @@ class _ILSScreenState extends State<ILSScreen> {
           _meeting.changeMode(Mode.VIEWER);
         }
       }
+    }).catchError((Object e) {
+      log("Subscribe failed: $e");
+      return PubSubMessages(messages: const []);
     });
   }
 
