@@ -146,7 +146,7 @@ class _ViewerJoinScreenState extends State<ViewerJoinScreen> {
               displayName: name,
               micEnabled: false,
               camEnabled: false,
-              mode: Mode.VIEWER,
+              mode: Mode.RECV_ONLY,
             ),
           ),
         );

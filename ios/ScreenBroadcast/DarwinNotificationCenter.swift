@@ -1,8 +1,17 @@
+//
+//  DarwinNotification.swift
+//  ScreenBroadcastiOS
+//
+//  Created by Parth Asodariya on 23/06/23.
+//  Copyright © 2023 CocoaPods. All rights reserved.
+//
+
 import Foundation
 
 enum DarwinNotification: String {
     case broadcastStarted = "iOS_BroadcastStarted"
     case broadcastStopped = "iOS_BroadcastStopped"
+    case stopBroadcastRequested = "iOS_StopBroadcastRequested"
 }
 
 class DarwinNotificationCenter {

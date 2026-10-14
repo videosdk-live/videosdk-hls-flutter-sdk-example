@@ -1,3 +1,11 @@
+//
+//  SocketConnection.swift
+//  ScreenBroadcastiOS
+//
+//  Created by Parth Asodariya on 23/06/23.
+//  Copyright © 2023 CocoaPods. All rights reserved.
+//
+
 import Foundation
 
 class SocketConnection: NSObject {
@@ -20,16 +28,16 @@ class SocketConnection: NSObject {
         socketHandle = Darwin.socket(AF_UNIX, SOCK_STREAM, 0)
 
         guard socketHandle != -1 else {
-            print("failure: create socket")
+            print("DEBUG::failure: create socket")
             return nil
         }
     }
 
     func open() -> Bool {
-        print("open socket connection")
+        print("DEBUG::open socket connection")
 
         guard FileManager.default.fileExists(atPath: filePath) else {
-            print("failure: socket file missing")
+            print("DEBUG::failure: socket file missing")
             return false
         }
       
@@ -63,7 +71,8 @@ class SocketConnection: NSObject {
     }
 
     func writeToStream(buffer: UnsafePointer<UInt8>, maxLength length: Int) -> Int {
-        outputStream?.write(buffer, maxLength: length) ?? 0
+        print("DEBUG::client stream writeToStream \(length)")
+        return outputStream?.write(buffer, maxLength: length) ?? 0
     }
 }
 
@@ -72,7 +81,7 @@ extension SocketConnection: StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         switch eventCode {
         case .openCompleted:
-            print("client stream open completed")
+            print("DEBUG::client stream open completed")
             if aStream == outputStream {
                 didOpen?()
             }
@@ -90,8 +99,22 @@ extension SocketConnection: StreamDelegate {
             if aStream == outputStream {
                 streamHasSpaceAvailable?()
             }
+        case .endEncountered:
+            // DEVIATION from the published example, which handles only the
+            // 0-byte read above and `.errorOccurred`.
+            //
+            // When the main app dies — killed from the switcher, crashed — the
+            // peer closes and CFStream delivers `.endEncountered`, not a
+            // readable event. Unhandled, the extension never learns the app is
+            // gone: it keeps capturing, the red recording bar stays up, and the
+            // next launch finds a broadcast it has no connection to and cannot
+            // stop. Finishing here is what makes the broadcast die with the app.
+            print("DEBUG::client stream end encountered — app side is gone")
+            close()
+            notifyDidClose(error: nil)
+
         case .errorOccurred:
-            print("client stream error occured: \(String(describing: aStream.streamError))")
+            print("DEBUG::client stream error occured: \(String(describing: aStream.streamError))")
             close()
             notifyDidClose(error: aStream.streamError)
 
@@ -105,8 +128,9 @@ private extension SocketConnection {
   
     func setupAddress() -> Bool {
         var addr = sockaddr_un()
+        addr.sun_family = sa_family_t(AF_UNIX)
         guard filePath.count < MemoryLayout.size(ofValue: addr.sun_path) else {
-            print("failure: fd path is too long")
+            print("DEBUG::failure: fd path is too long")
             return false
         }
 
@@ -115,7 +139,7 @@ private extension SocketConnection {
                 strncpy(ptr, $0, filePath.count)
             }
         }
-        
+
         address = addr
         return true
     }
@@ -124,7 +148,7 @@ private extension SocketConnection {
         guard var addr = address else {
             return false
         }
-        
+
         let status = withUnsafePointer(to: &addr) { ptr in
             ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) {
                 Darwin.connect(socketHandle, $0, socklen_t(MemoryLayout<sockaddr_un>.size))
@@ -132,10 +156,10 @@ private extension SocketConnection {
         }
 
         guard status == noErr else {
-            print("failure: \(status)")
+            print("DEBUG::failure: \(status)")
             return false
         }
-        
+
         return true
     }
 
@@ -155,36 +179,37 @@ private extension SocketConnection {
 
         scheduleStreams()
     }
-  
+
     func scheduleStreams() {
         shouldKeepRunning = true
-        
+
         networkQueue = DispatchQueue.global(qos: .userInitiated)
         networkQueue?.async { [weak self] in
             self?.inputStream?.schedule(in: .current, forMode: .common)
             self?.outputStream?.schedule(in: .current, forMode: .common)
             RunLoop.current.run()
-            
+
             var isRunning = false
-                        
+
             repeat {
                 isRunning = self?.shouldKeepRunning ?? false && RunLoop.current.run(mode: .default, before: .distantFuture)
-            } while (isRunning)
+            } while isRunning
         }
     }
-    
+
     func unscheduleStreams() {
         networkQueue?.sync { [weak self] in
             self?.inputStream?.remove(from: .current, forMode: .common)
             self?.outputStream?.remove(from: .current, forMode: .common)
         }
-        
+
         shouldKeepRunning = false
     }
-    
+
     func notifyDidClose(error: Error?) {
         if didClose != nil {
             didClose?(error)
         }
     }
 }
+

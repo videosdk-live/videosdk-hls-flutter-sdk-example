@@ -52,18 +52,13 @@ class _ILSScreenState extends State<ILSScreen> {
       roomId: widget.meetingId,
       // roomId:'oema-eybm-h67l',
       token: widget.token,
-      displayName: widget.displayName,
+      participantName: widget.displayName,
       micEnabled: widget.micEnabled,
       camEnabled: widget.camEnabled,
-      maxResolution: 'hd',
+      maxResolution: MaxResolution.HD,
       multiStream: true,
-      defaultCameraIndex: 1,
+      defaultCamera: FacingMode.FRONT,
       mode: widget.mode,
-      notification: const NotificationInfo(
-        title: "Video SDK",
-        message: "Video SDK is sharing screen in the meeting",
-        icon: "notification_share", // drawable icon name
-      ),
     );
 
     localParticipantMode = widget.mode;
@@ -83,7 +78,7 @@ class _ILSScreenState extends State<ILSScreen> {
           ? SafeArea(
               child: Scaffold(
                   backgroundColor: Theme.of(context).primaryColor,
-                  body: localParticipantMode == Mode.CONFERENCE
+                  body: localParticipantMode == Mode.SEND_AND_RECV
                       ? SpeakerView(meeting: meeting, token: widget.token)
                       : ViewerView(
                           meeting: meeting,
@@ -97,7 +92,7 @@ class _ILSScreenState extends State<ILSScreen> {
     _meeting.on(
       Events.roomJoined,
       () {
-        if (widget.mode == Mode.CONFERENCE) {
+        if (widget.mode == Mode.SEND_AND_RECV) {
           _meeting.localParticipant.pin();
         }
         setState(() {
@@ -111,7 +106,7 @@ class _ILSScreenState extends State<ILSScreen> {
 
     _meeting.on(Events.participantModeChanged, (Map<String, dynamic> data) {
       if (data['participantId'] == _meeting.localParticipant.id) {
-        if (_meeting.localParticipant.mode == Mode.CONFERENCE) {
+        if (_meeting.localParticipant.mode == Mode.SEND_AND_RECV) {
           meeting.localParticipant.pin();
         } else {
           meeting.localParticipant.unpin();
@@ -137,20 +132,20 @@ class _ILSScreenState extends State<ILSScreen> {
 
     _meeting.on(
         Events.error,
-        (error) => {
+        (VideoSDKError error) => {
               showSnackBarMessage(
-                  message: "${error['name']} :: ${error['message']}",
+                  message: "${error.name} :: ${error.message}",
                   context: context)
             });
   }
 
   void registerModeListener(Room _meeting) async {
-    PubSubMessages messages = await _meeting.pubSub
-        .subscribe("CHANGE_MODE_${_meeting.localParticipant.id}",
-            (PubSubMessage pubSubMessage) {
+    await _meeting.pubSub.subscribe(
+        "CHANGE_MODE_${_meeting.localParticipant.id}",
+        PubSubMessageListener(onMessageReceived: (PubSubMessage pubSubMessage) {
       Map<dynamic, dynamic> message = jsonDecode(pubSubMessage.message);
       if (mounted) {
-        if (message['mode'] == Mode.CONFERENCE.name) {
+        if (message['mode'] == Mode.SEND_AND_RECV.name) {
           showDialog(
               context: context,
               builder: (context) {
@@ -180,19 +175,18 @@ class _ILSScreenState extends State<ILSScreen> {
                         child: const Text("Accept",
                             style: TextStyle(fontSize: 16)),
                         onPressed: () {
-                          _meeting.changeMode(Mode.CONFERENCE);
+                          _meeting.changeMode(Mode.SEND_AND_RECV);
                           Navigator.pop(context);
                         }),
                   ],
                 );
               });
         } else {
-          _meeting.changeMode(Mode.VIEWER);
+          _meeting.changeMode(Mode.RECV_ONLY);
         }
       }
-    }).catchError((Object e) {
+    })).catchError((Object e) {
       log("Subscribe failed: $e");
-      return PubSubMessages(messages: const []);
     });
   }
 

@@ -20,7 +20,7 @@ class _ParticipantGridState extends State<ParticipantGrid> {
   String? presenterId;
   int numberofColumns = 1;
   int numberOfMaxOnScreenParticipants = 6;
-  String quality = "high";
+  VideoQuality quality = VideoQuality.HIGH;
 
   Map<String, Participant> participants = {};
   Map<String, Participant> onScreenParticipants = {};
@@ -30,7 +30,7 @@ class _ParticipantGridState extends State<ParticipantGrid> {
     localParticipant = widget.meeting.localParticipant;
     participants.putIfAbsent(localParticipant.id, () => localParticipant);
     participants.addAll(widget.meeting.participants);
-    presenterId = widget.meeting.activePresenterId;
+    presenterId = widget.meeting.getActivePresenterId();
     numberOfMaxOnScreenParticipants = presenterId != null ? 2 : 6;
     updateOnScreenParticipants();
     // Setting meeting event listeners
@@ -126,10 +126,10 @@ class _ParticipantGridState extends State<ParticipantGrid> {
     // Called when participant left meeting
     _meeting.on(
       Events.participantLeft,
-      (participantId) {
+      (Participant participant) {
         final newParticipants = participants;
 
-        newParticipants.remove(participantId);
+        newParticipants.remove(participant.id);
         setState(() {
           participants = newParticipants;
           updateOnScreenParticipants();
@@ -173,16 +173,16 @@ class _ParticipantGridState extends State<ParticipantGrid> {
       });
     });
 
-    _meeting.localParticipant.on(Events.streamEnabled, (Stream stream) {
-      if (stream.kind == "share") {
+    _meeting.localParticipant.on(Events.streamEnabled, (RTCStream stream) {
+      if (stream.kind == MediaType.SHARE) {
         setState(() {
           numberOfMaxOnScreenParticipants = 2;
           updateOnScreenParticipants();
         });
       }
     });
-    _meeting.localParticipant.on(Events.streamDisabled, (Stream stream) {
-      if (stream.kind == "share") {
+    _meeting.localParticipant.on(Events.streamDisabled, (RTCStream stream) {
+      if (stream.kind == MediaType.SHARE) {
         setState(() {
           numberOfMaxOnScreenParticipants = 6;
           updateOnScreenParticipants();
@@ -194,7 +194,7 @@ class _ParticipantGridState extends State<ParticipantGrid> {
   updateOnScreenParticipants() {
     Map<String, Participant> newScreenParticipants = <String, Participant>{};
     List<Participant> conferenceParticipants = participants.values
-        .where((element) => element.mode == Mode.CONFERENCE)
+        .where((element) => element.mode == Mode.SEND_AND_RECV)
         .toList();
 
     conferenceParticipants
@@ -219,10 +219,10 @@ class _ParticipantGridState extends State<ParticipantGrid> {
       setState(() {
         onScreenParticipants = newScreenParticipants;
         quality = newScreenParticipants.length > 4
-            ? "low"
+            ? VideoQuality.LOW
             : newScreenParticipants.length > 2
-                ? "medium"
-                : "high";
+                ? VideoQuality.MEDIUM
+                : VideoQuality.HIGH;
       });
     }
     if (numberofColumns !=

@@ -1,3 +1,11 @@
+//
+//  SampleHandler.swift
+//  ScreenBroadcastiOS
+//
+//  Created by Parth Asodariya on 23/06/23.
+//  Copyright © 2023 CocoaPods. All rights reserved.
+//
+
 import ReplayKit
 import OSLog
 
@@ -11,35 +19,37 @@ class SampleHandler: RPBroadcastSampleHandler {
     
     private var clientConnection: SocketConnection?
     private var uploader: SampleUploader?
-    
+   
     private var frameCount: Int = 0
-    
+    private let finishLock = NSLock()
+    private var finishing = false
+   
     var socketFilePath: String {
-      let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroupIdentifier)
-        return sharedContainer?.appendingPathComponent("rtc_SSFD").path ?? ""
+     let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroupIdentifier)
+       return sharedContainer?.appendingPathComponent("rtc_SSFD").path ?? ""
     }
     
     override init() {
-      super.init()
-        if let connection = SocketConnection(filePath: socketFilePath) {
-          clientConnection = connection
-          setupConnection()
-          
-          uploader = SampleUploader(connection: connection)
-        }
-        os_log(.debug, log: broadcastLogger, "%{public}s", socketFilePath)
-    }
+        super.init()
+          if let connection = SocketConnection(filePath: socketFilePath) {
+            clientConnection = connection
+            setupConnection()
+            uploader = SampleUploader(connection: connection)
+          }
+          os_log(.debug, log: broadcastLogger, "%{public}s", socketFilePath)
+      }
 
-    override func broadcastStarted(withSetupInfo setupInfo: [String: NSObject]?) {
+    override func broadcastStarted(withSetupInfo setupInfo: [String : NSObject]?) {
         // User has requested to start the broadcast. Setup info from the UI extension can be supplied but optional.
         frameCount = 0
-        
-        DarwinNotificationCenter.shared.postNotification(.broadcastStarted)
-        openConnection()
-        
-        let notificationName = CFNotificationName("videosdk.flutter.startScreenShare" as CFString)
-        let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
-        CFNotificationCenterPostNotification(notificationCenter, notificationName, nil, nil, true)
+               
+       DarwinNotificationCenter.shared.postNotification(.broadcastStarted)
+       openConnection()
+       
+       let notificationName = CFNotificationName("videosdk.flutter.startScreenShare" as CFString)
+       let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
+       CFNotificationCenterPostNotification(notificationCenter, notificationName, nil, nil, true)
+       observeStopRequest()
     }
     
     override func broadcastPaused() {
@@ -52,6 +62,7 @@ class SampleHandler: RPBroadcastSampleHandler {
     
     override func broadcastFinished() {
         // User has requested to finish the broadcast.
+        CFNotificationCenterRemoveEveryObserver(CFNotificationCenterGetDarwinNotifyCenter(), Unmanaged.passUnretained(self).toOpaque())
         DarwinNotificationCenter.shared.postNotification(.broadcastStopped)
         clientConnection?.close()
         let notificationName = CFNotificationName("videosdk.flutter.stopScreenShare" as CFString)
@@ -62,19 +73,51 @@ class SampleHandler: RPBroadcastSampleHandler {
     override func processSampleBuffer(_ sampleBuffer: CMSampleBuffer, with sampleBufferType: RPSampleBufferType) {
         switch sampleBufferType {
         case RPSampleBufferType.video:
-            uploader?.send(sample: sampleBuffer)
-        default:
+            // Handle video sample buffer
+            frameCount += 1
+            if frameCount % 3 == 0 {
+                uploader?.send(sample: sampleBuffer)
+            }
+            break
+        case .audioApp:
+            break
+        case .audioMic:
+            break
+        @unknown default:
             break
         }
     }
 }
 
 private extension SampleHandler {
+
+    /// The plugin posts this when the app's share stops: the SDK no longer ends the broadcast itself.
+    func observeStopRequest() {
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            Unmanaged.passUnretained(self).toOpaque(),
+            { _, observer, _, _, _ in
+                guard let observer = observer else { return }
+                Unmanaged<SampleHandler>.fromOpaque(observer).takeUnretainedValue().finishOnce()
+            },
+            DarwinNotification.stopBroadcastRequested.rawValue as CFString,
+            nil,
+            .deliverImmediately
+        )
+    }
+
+    func finishOnce() {
+        finishLock.lock()
+        let alreadyFinishing = finishing
+        finishing = true
+        finishLock.unlock()
+        guard !alreadyFinishing else { return }
+        finishBroadcastWithError(NSError(domain: RPRecordingErrorDomain, code: 10001,
+                                         userInfo: [NSLocalizedDescriptionKey: "Screen sharing stopped"]))
+    }
   
     func setupConnection() {
         clientConnection?.didClose = { [weak self] error in
-            os_log(.debug, log: broadcastLogger, "client connection did close \(String(describing: error))")
-          
             if let error = error {
                 self?.finishBroadcastWithError(error)
             } else {
@@ -89,6 +132,11 @@ private extension SampleHandler {
     func openConnection() {
         let queue = DispatchQueue(label: "broadcast.connectTimer")
         let timer = DispatchSource.makeTimerSource(queue: queue)
+        
+//        let notificationName = CFNotificationName("videosdk.flutter.log" as CFString)
+//        let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
+//        CFNotificationCenterPostNotification(notificationCenter, notificationName, nil, ["testing": "connection name is here"] as CFDictionary, true)
+
         timer.schedule(deadline: .now(), repeating: .milliseconds(100), leeway: .milliseconds(500))
         timer.setEventHandler { [weak self] in
             guard self?.clientConnection?.open() == true else {

@@ -4,12 +4,12 @@ publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: ">=2.19.3 <3.0.0"
+  sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  videosdk: ^4.0.1
+  videosdk: ^5.0.0
   http: ^01.2.2
   flutter_dotenv: ^5.0.2
   flutter_svg: ^2.0.2
@@ -22,6 +22,9 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
+  config:
+    enable-swift-package-manager: true
+
   uses-material-design: true
   assets:
     - assets/
