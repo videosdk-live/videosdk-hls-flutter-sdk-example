@@ -25,10 +25,10 @@ class _SpeakerViewState extends State<SpeakerView> {
   bool showChatSnackbar = true;
 
   // Streams
-  Stream? shareStream;
-  Stream? videoStream;
-  Stream? audioStream;
-  Stream? remoteParticipantShareStream;
+  RTCStream? shareStream;
+  RTCStream? videoStream;
+  RTCStream? audioStream;
+  RTCStream? remoteParticipantShareStream;
 
   bool fullScreen = false;
 
@@ -119,8 +119,8 @@ class _SpeakerViewState extends State<SpeakerView> {
               },
 
               onSwitchMicButtonPressed: (details) async {
-                List<AudioDeviceInfo>? outptuDevice =
-                    await VideoSDK.getAudioDevices();
+                List<MicrophoneDeviceInfo>? outptuDevice =
+                    await VideoSDK.getMics();
                 double bottomMargin = (70.0 * outptuDevice!.length);
                 final screenSize = MediaQuery.of(context).size;
                 await showMenu(
@@ -135,19 +135,19 @@ class _SpeakerViewState extends State<SpeakerView> {
                     (bottomMargin),
                   ),
                   items: outptuDevice.map((e) {
-                    return PopupMenuItem(value: e, child: Text(e.label));
+                    return PopupMenuItem(value: e, child: Text(e.label ?? ''));
                   }).toList(),
                   elevation: 8.0,
                 ).then((value) {
                   if (value != null) {
-                    widget.meeting.switchAudioDevice(value);
+                    widget.meeting.setAudioDevice(value);
                   }
                 });
               },
 
               onSwitchCameraButtonPressed: (details) async {
-                List<VideoDeviceInfo>? outptuDevice =
-                    await VideoSDK.getVideoDevices();
+                List<CameraDeviceInfo>? outptuDevice =
+                    await VideoSDK.getCameras();
                 double bottomMargin = (70.0 * outptuDevice!.length);
                 final screenSize = MediaQuery.of(context).size;
                 await showMenu(
@@ -162,12 +162,12 @@ class _SpeakerViewState extends State<SpeakerView> {
                     (bottomMargin),
                   ),
                   items: outptuDevice.map((e) {
-                    return PopupMenuItem(value: e, child: Text(e.label));
+                    return PopupMenuItem(value: e, child: Text(e.label ?? ''));
                   }).toList(),
                   elevation: 8.0,
                 ).then((value) {
                   if (value != null) {
-                    widget.meeting.changeCam(value);
+                    widget.meeting.changeCam(deviceId: value.deviceId);
                   }
                 });
               },
@@ -222,16 +222,16 @@ class _SpeakerViewState extends State<SpeakerView> {
 
   void registerMeetingEvents(Room _meeting) {
     // Called when stream is enabled
-    _meeting.localParticipant.on(Events.streamEnabled, (Stream _stream) {
-      if (_stream.kind == 'video') {
+    _meeting.localParticipant.on(Events.streamEnabled, (RTCStream _stream) {
+      if (_stream.kind == MediaType.VIDEO) {
         setState(() {
           videoStream = _stream;
         });
-      } else if (_stream.kind == 'audio') {
+      } else if (_stream.kind == MediaType.AUDIO) {
         setState(() {
           audioStream = _stream;
         });
-      } else if (_stream.kind == 'share') {
+      } else if (_stream.kind == MediaType.SHARE) {
         setState(() {
           shareStream = _stream;
         });
@@ -239,16 +239,18 @@ class _SpeakerViewState extends State<SpeakerView> {
     });
 
     // Called when stream is disabled
-    _meeting.localParticipant.on(Events.streamDisabled, (Stream _stream) {
-      if (_stream.kind == 'video' && videoStream?.id == _stream.id) {
+    _meeting.localParticipant.on(Events.streamDisabled, (RTCStream _stream) {
+      if (_stream.kind == MediaType.VIDEO && videoStream?.id == _stream.id) {
         setState(() {
           videoStream = null;
         });
-      } else if (_stream.kind == 'audio' && audioStream?.id == _stream.id) {
+      } else if (_stream.kind == MediaType.AUDIO &&
+          audioStream?.id == _stream.id) {
         setState(() {
           audioStream = null;
         });
-      } else if (_stream.kind == 'share' && shareStream?.id == _stream.id) {
+      } else if (_stream.kind == MediaType.SHARE &&
+          shareStream?.id == _stream.id) {
         setState(() {
           shareStream = null;
         });
@@ -261,8 +263,8 @@ class _SpeakerViewState extends State<SpeakerView> {
           _meeting.participants[_activePresenterId];
 
       // Get Share Stream
-      Stream? _stream = activePresenterParticipant?.streams.values
-          .singleWhere((e) => e.kind == "share");
+      RTCStream? _stream = activePresenterParticipant?.streams.values
+          .singleWhere((e) => e.kind == MediaType.SHARE);
 
       setState(() => remoteParticipantShareStream = _stream);
     });
@@ -273,16 +275,17 @@ class _SpeakerViewState extends State<SpeakerView> {
               if (mounted)
                 {
                   showSnackBarMessage(
-                      message: error['name'].toString() +
+                      message: error.name.toString() +
                           " :: " +
-                          error['message'].toString(),
+                          error.message.toString(),
                       context: context)
                 }
             });
   }
 
   void subscribeToChatMessages(Room meeting) {
-    meeting.pubSub.subscribe("CHAT", (message) {
+    meeting.pubSub.subscribe("CHAT",
+        PubSubMessageListener(onMessageReceived: (message) {
       if (message.senderId != meeting.localParticipant.id) {
         if (mounted) {
           if (showChatSnackbar) {
@@ -292,12 +295,12 @@ class _SpeakerViewState extends State<SpeakerView> {
           }
         }
       }
-    }).catchError((Object e) {
+    })).catchError((Object e) {
       log("Subscribe failed: $e");
-      return PubSubMessages(messages: const []);
     });
 
-    meeting.pubSub.subscribe("RAISE_HAND", (message) {
+    meeting.pubSub.subscribe("RAISE_HAND",
+        PubSubMessageListener(onMessageReceived: (message) {
       if (message.senderId != meeting.localParticipant.id) {
         if (mounted) {
           if (showChatSnackbar) {
@@ -311,9 +314,8 @@ class _SpeakerViewState extends State<SpeakerView> {
           }
         }
       }
-    }).catchError((Object e) {
+    })).catchError((Object e) {
       log("Subscribe failed: $e");
-      return PubSubMessages(messages: const []);
     });
   }
 

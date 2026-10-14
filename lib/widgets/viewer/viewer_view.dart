@@ -39,9 +39,7 @@ class _ViewerViewState extends State<ViewerView> {
     super.initState();
     // Register meeting events
     hlsState = widget.meeting.hlsState;
-    if (widget.meeting.hlsUrls != null) {
-      playbackHlsUrl = widget.meeting.hlsUrls['playbackHlsUrl'];
-    }
+    playbackHlsUrl = widget.meeting.hlsUrl?.playbackHlsUrl;
     participants = widget.meeting.participants.length + 1;
 
     registerMeetingEvents(widget.meeting);
@@ -97,8 +95,10 @@ class _ViewerViewState extends State<ViewerView> {
                         });
                       },
                       onRaiseHandButtonClicked: () {
-                        widget.meeting.pubSub.publish("RAISE_HAND", "message")
-                            .catchError((Object e) => log("Publish failed: $e"));
+                        widget.meeting.pubSub
+                            .publish("RAISE_HAND", "message")
+                            .catchError(
+                                (Object e) => log("Publish failed: $e"));
                       },
                       onPlaybackEnded: () {
                         setState(() {
@@ -183,18 +183,18 @@ class _ViewerViewState extends State<ViewerView> {
       });
     });
     // Called when hls is started
-    _meeting.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
+    _meeting.on(Events.hlsStateChanged, (String status, HLSUrl? hlsUrl) {
       setState(() {
-        hlsState = data['status'];
+        hlsState = status;
       });
-      if (data['status'] == "HLS_PLAYABLE") {
+      if (status == "HLS_PLAYABLE") {
         setState(() {
-          playbackHlsUrl = data['playbackHlsUrl'];
+          playbackHlsUrl = hlsUrl?.playbackHlsUrl;
           isEnded = false;
           showOverlay = true;
           hideOverlay();
         });
-      } else if (data['status'] == "HLS_STOPPED") {
+      } else if (status == "HLS_STOPPED") {
         setState(() {
           playbackHlsUrl = null;
         });
@@ -202,17 +202,17 @@ class _ViewerViewState extends State<ViewerView> {
     });
     _meeting.on(
         Events.error,
-        (error) => {
+        (VideoSDKError error) => {
               showSnackBarMessage(
-                  message: error['name'].toString() +
-                      " :: " +
-                      error['message'].toString(),
+                  message:
+                      error.name.toString() + " :: " + error.message.toString(),
                   context: context)
             });
   }
 
   void subscribeToChatMessages(Room meeting) {
-    meeting.pubSub.subscribe("CHAT", (message) {
+    meeting.pubSub.subscribe("CHAT",
+        PubSubMessageListener(onMessageReceived: (message) {
       if (message.senderId != meeting.localParticipant.id) {
         if (mounted) {
           if (showChatSnackbar) {
@@ -222,9 +222,8 @@ class _ViewerViewState extends State<ViewerView> {
           }
         }
       }
-    }).catchError((Object e) {
+    })).catchError((Object e) {
       log("Subscribe failed: $e");
-      return PubSubMessages(messages: const []);
     });
   }
 

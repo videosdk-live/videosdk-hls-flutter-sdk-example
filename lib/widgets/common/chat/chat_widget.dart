@@ -15,6 +15,10 @@ class ChatWidget extends StatelessWidget {
       required this.orientation})
       : super(key: key);
 
+  // shortcut: timestamp is a server string; falls back to now if it is not ISO-8601
+  DateTime get _time =>
+      (DateTime.tryParse(message.timestamp) ?? DateTime.now()).toLocal();
+
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -61,7 +65,7 @@ class ChatWidget extends StatelessWidget {
                 Container(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    "${message.timestamp.toLocal().hour}:${message.timestamp.toLocal().minute}",
+                    "${_time.hour}:${_time.minute}",
                     textAlign: TextAlign.end,
                     style: TextStyle(
                         color: black400,

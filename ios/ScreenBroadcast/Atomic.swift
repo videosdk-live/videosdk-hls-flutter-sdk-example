@@ -1,3 +1,10 @@
+//
+//  Atomic.swift
+//  ScreenBroadcastiOS
+//
+//  Created by Parth Asodariya on 23/06/23.
+//  Copyright © 2023 CocoaPods. All rights reserved.
+//
 
 import Foundation
 
@@ -5,7 +12,7 @@ import Foundation
 struct Atomic<Value> {
 
     private var value: Value
-    private let lock = NSLock()
+    private let lock = NSLock() 
 
     init(wrappedValue value: Value) {
         self.value = value
@@ -28,3 +35,4 @@ struct Atomic<Value> {
         value = newValue
     }
 }
+

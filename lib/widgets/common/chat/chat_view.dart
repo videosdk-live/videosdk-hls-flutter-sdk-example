@@ -31,8 +31,13 @@ class _ChatViewState extends State<ChatView> {
   // MessageTextController
   final msgTextController = TextEditingController();
 
-  // PubSubMessages
-  PubSubMessages? messages;
+  // Chat messages; null until the subscription is ready
+  List<PubSubMessage>? messages;
+  late final PubSubMessageListener chatListener = PubSubMessageListener(
+    onMessageReceived: messageHandler,
+    onOldMessagesReceived: (oldMessages, info) =>
+        setState(() => messages = [...oldMessages, ...?messages]),
+  );
   bool isRaisedHand = false;
 
   @override
@@ -41,8 +46,8 @@ class _ChatViewState extends State<ChatView> {
 
     // Subscribing 'CHAT' Topic
     widget.meeting.pubSub
-        .subscribe("CHAT", messageHandler)
-        .then((value) => setState((() => messages = value)))
+        .subscribe("CHAT", chatListener)
+        .then((_) => setState(() => messages ??= []))
         .catchError((Object e) => log("Subscribe failed: $e"));
   }
 
@@ -96,7 +101,7 @@ class _ChatViewState extends State<ChatView> {
                       : SingleChildScrollView(
                           reverse: true,
                           child: Column(
-                            children: messages!.messages
+                            children: messages!
                                 .map(
                                   (e) => ChatWidget(
                                     orientation: widget.orientation,
@@ -187,8 +192,8 @@ class _ChatViewState extends State<ChatView> {
                           if (!isRaisedHand) {
                             widget.meeting.pubSub
                                 .publish("RAISE_HAND", "message")
-                                .catchError((Object e) =>
-                                    log("Publish failed: $e"));
+                                .catchError(
+                                    (Object e) => log("Publish failed: $e"));
                             setState(() {
                               isRaisedHand = true;
                             });
@@ -227,13 +232,13 @@ class _ChatViewState extends State<ChatView> {
   }
 
   void messageHandler(PubSubMessage message) {
-    setState(() => messages!.messages.add(message));
+    setState(() => (messages ??= []).add(message));
   }
 
   @override
   void dispose() {
     widget.meeting.pubSub
-        .unsubscribe("CHAT", messageHandler)
+        .unsubscribe("CHAT", chatListener)
         .catchError((Object e) => log("Unsubscribe failed: $e"));
     super.dispose();
   }

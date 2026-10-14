@@ -124,24 +124,24 @@ class SpeakerAppBarState extends State<SpeakerAppBar> {
                           context: context);
                     } else if (hlsState == "HLS_STARTED" ||
                         hlsState == "HLS_PLAYABLE") {
-                      widget.meeting.stopHls();
+                      widget.meeting.stopHLS();
                     } else if (hlsState == "HLS_STARTING") {
                       showSnackBarMessage(
                           message: "HLS is in starting state",
                           context: context);
                     } else {
-                      Map<String, dynamic> config = {
-                        'layout': {
-                          "type": "SPOTLIGHT",
-                          "priority": "PIN",
-                          "gridSize": "4",
-                        },
-                        'theme': "DARK",
-                        'mode': "video-and-audio",
-                        'orientation': "landscape",
-                        'quality': "high",
-                      };
-                      widget.meeting.startHls(config: config);
+                      widget.meeting.startHLS(
+                          config: const HLSConfig(
+                        layout: ConfigLayout(
+                          type: ConfigLayoutGrid.SPOTLIGHT,
+                          priority: ConfigLayoutPriority.PIN,
+                          gridSize: 4,
+                        ),
+                        theme: ConfigTheme.DARK,
+                        mode: ConfigMode.VIDEO_AND_AUDIO,
+                        orientation: ConfigOrientation.LANDSCAPE,
+                        quality: ConfigQuality.HIGH,
+                      ));
                     }
                   }),
               const HorizontalSpacer(),
@@ -211,15 +211,15 @@ class SpeakerAppBarState extends State<SpeakerAppBar> {
   }
 
   void addMeetingListener(Room meeting) {
-    meeting.on(Events.hlsStateChanged, (Map<String, dynamic> data) {
+    meeting.on(Events.hlsStateChanged, (String status, HLSUrl? hlsUrl) {
       if (mounted) {
         showSnackBarMessage(
             message:
-                "Meeting HLS ${data['status'] == "HLS_STARTING" ? "is starting" : (data['status'] == "HLS_STARTED" || data['status'] == "HLS_PLAYABLE") ? "started" : data['status'] == "HLS_STOPPING" ? "is stopping" : "stopped"}",
+                "Meeting HLS ${status == "HLS_STARTING" ? "is starting" : (status == "HLS_STARTED" || status == "HLS_PLAYABLE") ? "started" : status == "HLS_STOPPING" ? "is stopping" : "stopped"}",
             context: context);
       }
       setState(() {
-        hlsState = data['status'];
+        hlsState = status;
       });
     });
 
@@ -231,10 +231,10 @@ class SpeakerAppBarState extends State<SpeakerAppBar> {
       }
     });
 
-    meeting.on(Events.participantLeft, (participantId) {
+    meeting.on(Events.participantLeft, (Participant participant) {
       if (mounted) {
         final newParticipants = _participants;
-        newParticipants.remove(participantId);
+        newParticipants.remove(participant.id);
 
         setState(() => _participants = newParticipants);
       }

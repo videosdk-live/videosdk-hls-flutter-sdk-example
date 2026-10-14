@@ -73,15 +73,17 @@ class _ParticipantListState extends State<ParticipantList> {
                     if (value == "Remove from Co-host" ||
                         value == "Add as a Co-host") {
                       log("Selected Change Mode ${_participants.values.elementAt(index).id}");
-                      widget.meeting.pubSub.publish(
-                          "CHANGE_MODE_${_participants.values.elementAt(index).id}",
-                          jsonEncode({
-                            "mode":
-                                _participants.values.elementAt(index).mode ==
-                                        Mode.CONFERENCE
-                                    ? Mode.VIEWER.name
-                                    : Mode.CONFERENCE.name
-                          }))
+                      widget.meeting.pubSub
+                          .publish(
+                              "CHANGE_MODE_${_participants.values.elementAt(index).id}",
+                              jsonEncode({
+                                "mode": _participants.values
+                                            .elementAt(index)
+                                            .mode ==
+                                        Mode.SEND_AND_RECV
+                                    ? Mode.RECV_ONLY.name
+                                    : Mode.SEND_AND_RECV.name
+                              }))
                           .catchError((Object e) => log("Publish failed: $e"));
                     } else if (value == "Remove Participant") {
                       log("Selected remove participnt");
@@ -116,10 +118,10 @@ class _ParticipantListState extends State<ParticipantList> {
       }
     });
 
-    meeting.on(Events.participantLeft, (participantId) {
+    meeting.on(Events.participantLeft, (Participant participant) {
       if (mounted) {
         final newParticipants = _participants;
-        newParticipants.remove(participantId);
+        newParticipants.remove(participant.id);
 
         setState(() => _participants = newParticipants);
       }
@@ -127,7 +129,8 @@ class _ParticipantListState extends State<ParticipantList> {
   }
 
   void addRaiseHandListener(Room meeting) {
-    meeting.pubSub.subscribe("RAISE_HAND", (message) {
+    meeting.pubSub.subscribe("RAISE_HAND",
+        PubSubMessageListener(onMessageReceived: (message) {
       List<String> participants = raisedHandParticipant;
       setState(() {
         participants.add(message.senderId);
@@ -138,9 +141,8 @@ class _ParticipantListState extends State<ParticipantList> {
           participants.remove(message.senderId);
         });
       });
-    }).catchError((Object e) {
+    })).catchError((Object e) {
       log("Subscribe failed: $e");
-      return PubSubMessages(messages: const []);
     });
   }
 }
