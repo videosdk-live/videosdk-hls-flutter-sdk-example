@@ -1,1 +1,3 @@
 -keep class org.videolan.libvlc.** { *; }
+-keep class videosdk.org.** { *; }
+-dontwarn videosdk.org.webrtc.AudioTrack$AudioProcessingPlatformPolicy

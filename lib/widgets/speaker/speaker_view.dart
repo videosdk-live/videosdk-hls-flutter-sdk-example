@@ -140,7 +140,7 @@ class _SpeakerViewState extends State<SpeakerView> {
                   elevation: 8.0,
                 ).then((value) {
                   if (value != null) {
-                    widget.meeting.setAudioDevice(value);
+                    widget.meeting.changeMic(deviceId: value.deviceId);
                   }
                 });
               },
